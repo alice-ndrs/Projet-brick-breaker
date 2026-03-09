@@ -12,7 +12,7 @@ project: $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o project
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
+#pas sur de la ligne au dessus
 # Definitions de cibles particulieres
 
 depend:
