@@ -1,5 +1,6 @@
 #include <iostream>
 #include "game.h"
+#include "message.h"
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -15,7 +16,17 @@ void game::getLevel(const string& filename){ // méthode de lecture de fichier
     while (getline(file>>ws, line)) {
         istringstream data(line);
         // lire les données, créer les objets nécessaires
+        // lecture du score :
+        int score;
+        data >> score;
+
+        if (score < 0) {
+            std::cout << message::invalid_score(score);
+            return;
+        }
     }
+
+    // mettre un destructeur avec "Correct file"
 }
 
 // getLevel est responsable de lire le fichier et vérifier que son contenu est correct.
