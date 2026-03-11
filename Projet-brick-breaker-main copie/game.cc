@@ -21,8 +21,14 @@ void game::getLevel(const string& filename){ // méthode de lecture de fichier
         data >> score;
 
         if (score < 0) {
-            std::cout << message::invalid_score(score);
+            cout << message::invalid_score(score);
             return;
+        }
+
+        int lives;
+        data >> lives;
+        if (lives < 0){
+            cout<<message::invalid_lives(lives);
         }
     }
 
@@ -36,5 +42,3 @@ void game::getLevel(const string& filename){ // méthode de lecture de fichier
 game::game (int lives,int score):
 lives(lives),score(score)
 {}
-
-// test
