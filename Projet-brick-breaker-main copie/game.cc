@@ -25,3 +25,5 @@ void game::getLevel(const string& filename){ // méthode de lecture de fichier
 game::game (int lives,int score):
 lives(lives),score(score)
 {}
+
+// test
