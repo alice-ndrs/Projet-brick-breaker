@@ -1,9 +1,12 @@
-#ifndef brick_H
-#define brick_H
+#ifndef BALL_H
+#define BALL_H
 
-class ball{
+class Ball{
     public:
-        ball (double x,double y,double r,double dx,double dy);
+        Ball (double x,double y,double r,double dx,double dy);
+        double getX() const { return x; }
+        double getY() const { return y; }
+        double getR() const { return r; }
     private:
         double x,y; // position 
         double r; //rayon

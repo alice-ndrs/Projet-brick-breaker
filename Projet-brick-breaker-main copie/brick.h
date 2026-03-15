@@ -1,12 +1,15 @@
 #include <iostream>
 using namespace std;
 
-#ifndef brick_H
-#define brick_H
+#ifndef BRICK_H
+#define BRICK_H
 
-class brick{
+class Brick{
     public:
-        brick(int t, double x, double y, double c, int h);
+        Brick(int t, double x, double y, double c, int h=0);
+        double getX() const { return x; }
+        double getY() const { return y; }
+        double getC() const { return c; }
     private:
         int t;// type de brick parmis les 3
         double x,y;// position 
