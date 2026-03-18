@@ -4,6 +4,7 @@
 class Ball{
     public:
         Ball (double x,double y,double r,double dx,double dy);
+        int check_Ball (Ball b);
         double getX() const { return x; }
         double getY() const { return y; }
         double getR() const { return r; }

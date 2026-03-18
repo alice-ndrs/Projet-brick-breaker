@@ -3,7 +3,8 @@
 
 class Paddle {
     public:
-        Paddle (double x,double y, double r);
+        Paddle (double x = 0,double y = 0, double r = 0); // constructeur par défaut
+        int check_Paddle(Paddle p);
         double getX() const { return x; }
         double getY() const { return y; }
         double getR() const { return r; }
