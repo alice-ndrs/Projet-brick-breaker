@@ -9,7 +9,7 @@ Paddle::Paddle (double x,double y, double r):
 x(x),y(y),r(r)
 {}
 
-int Paddle::check_Paddle(Paddle p){
+int Paddle::check_Paddle(){
     if (y > 0) {
         cout << message::paddle_outside(x, y);
         return 1;

@@ -11,7 +11,7 @@ Brick :: Brick (int t, double x, double y, double c, int h ):
 t(t),x(x),y(y),c(c),h(h)
 {}
 
-int Brick::check_Brick(Brick b){
+int Brick::check_Brick(){
     if (t>2 or t<0){
         cout << message::invalid_brick_type(t);
         return 1;
