@@ -22,4 +22,19 @@ class Brick{
         int h; // niveau de resistance
 };
 
+class Rainbow_brick : public Brick {
+    private : 
+        int hit_points;
+};
+
+class Ball_brick : public Brick {
+    private :
+        double new_ball_radius;
+};
+
+class Split_brick : public Brick {
+    private :
+        double split_brick_gap;
+};
+
 #endif
