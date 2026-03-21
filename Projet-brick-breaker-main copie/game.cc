@@ -144,13 +144,21 @@ bool Game::decodage_brick(istringstream& data) {
         int h;
         if (!(data >> h)) return false;
 
-        Brick b(t, x, y, c, h);
+        Rainbow_brick b(t, x, y, c, h);
         if (b.check_Brick()) {
             return false;
         }
         bricks.push_back(b);
-    } else {
-        Brick b(t, x, y, c);
+    } 
+    if (t == 1) {
+        Ball_brick b(t, x, y, c);
+        if (b.check_Brick()) {
+            return false;
+        }
+        bricks.push_back(b);
+    }
+    if (t == 2) {
+        Split_brick b(t, x, y, c);
         if (b.check_Brick()) {
             return false;
         }

@@ -23,16 +23,22 @@ class Brick{
 };
 
 class Rainbow_brick : public Brick {
+    public :
+        Rainbow_brick(int t, double x, double y, double c, int h) : Brick(t, x, y, c, h) {}
     private : 
         int hit_points;
 };
 
 class Ball_brick : public Brick {
+    public :
+        Ball_brick(int t, double x, double y, double c) : Brick(t, x, y, c) {}
     private :
         double new_ball_radius;
 };
 
 class Split_brick : public Brick {
+    public :
+        Split_brick(int t, double x, double y, double c) : Brick(t, x, y, c) {}
     private :
         double split_brick_gap;
 };
