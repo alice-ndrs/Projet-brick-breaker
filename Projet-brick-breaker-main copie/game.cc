@@ -71,6 +71,9 @@ bool Game::getLevel(const string& filename){ // méthode de lecture de fichier
                 return false;
         }
         if (etat != FIN) return false;
+
+        if (check_Collisions()) { return false; }
+        
         cout<<message::success() << endl;
         return true;
     }
@@ -134,27 +137,34 @@ bool Game::decodage_nb_bricks(istringstream& data) {
 bool Game::decodage_brick(istringstream& data) {
     int t;
     double x, y, c;
-    data >> t >> x >> y >> c;
+
+    if (!(data >> t >> x >> y >> c)) return false;
 
     if (t == 0) {
         int h;
-        if (!(data >> x >> y >> c >> h)) return false;
+        if (!(data >> h)) return false;
 
-        Brick b(t, x, y, c, h);
+        Rainbow_brick b(t, x, y, c, h);
         if (b.check_Brick()) {
             return false;
         }
         bricks.push_back(b);
-    } else {
-        if (!(data >> x >> y >> c)) return false;
-
-        Brick b(t, x, y, c);
+    } 
+    if (t == 1) {
+        Ball_brick b(t, x, y, c);
         if (b.check_Brick()) {
             return false;
         }
         bricks.push_back(b);
     }
-    
+    if (t == 2) {
+        Split_brick b(t, x, y, c);
+        if (b.check_Brick()) {
+            return false;
+        }
+        bricks.push_back(b);
+    }
+
     ++count;
 
     if (count == total) {
