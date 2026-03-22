@@ -2,7 +2,7 @@
 
 CXX     = g++
 CXXFLAGS = -g -Wall -std=c++11
-CXXFILES = Project.cc Ball.cc Brick.cc Paddle.cc Game.cc Message.cc
+CXXFILES = Project.cc Ball.cc Brick.cc Paddle.cc Game.cc Message.cc Rainbow_Brick.cc
 OBJ = $(CXXFILES:.cc=.o)
 
 
@@ -28,10 +28,11 @@ clean:
 	@/bin/rm -f *.o *.x *.cc~ *.h~ project
 
 # DO NOT DELETE THIS LINE
-Project.o: Project.cc
-Ball.o: Ball.cc Ball.h
-Brick.o: Brick.cc Brick.h
-Paddle.o: Paddle.cc Paddle.h
-Game.o: Game.cc Game.h Message.h Brick.h Ball.h Paddle.h constants.h \
+Project.o: Project.cc Game.h Brick.h Paddle.h Ball.h
+Ball.o: Ball.cc Ball.h Constants.h tools.h Message.h Brick.h Paddle.h
+Brick.o: Brick.cc Brick.h Paddle.h Message.h Constants.h tools.h
+Paddle.o: Paddle.cc Paddle.h Message.h Constants.h tools.h
+Game.o: Game.cc Game.h Brick.h Paddle.h Ball.h Message.h Constants.h \
   tools.h
-Message.o: Message.cc Message.h Brick.h
+Message.o: Message.cc Message.h
+Rainbow_Brick.o: Rainbow_Brick.cc Rainbow_Brick.h Brick.h Paddle.h
