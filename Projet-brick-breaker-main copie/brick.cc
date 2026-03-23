@@ -8,7 +8,7 @@ using namespace std;
 
 
 Brick :: Brick (double t, double x, double y, double c, double h ):
-t(t),x(x),y(y),c(c),h(h)
+t(t), square{{x,y}, c}, h(h)
 {}
 
 int Brick::check_Brick(){
@@ -17,14 +17,21 @@ int Brick::check_Brick(){
         return 1;
     }
     
-    if ((x - c/2 < 0 || arena_size < x + c/2) ||
-    (y - c/2 < 0 || arena_size < y + c/2)){
-        cout << message::brick_outside(x,y);
+    // if ((x - c/2 < 0 || arena_size < x + c/2) ||
+    // (y - c/2 < 0 || arena_size < y + c/2)){
+    //     cout << message::brick_outside(x,y);
+    //     return 1;
+    // }
+    if ((square.center.x - square.side/2 < 0 || arena_size < square.center.x + square.side/2) ||
+    (square.center.y - square.side/2 < 0 || arena_size < square.center.y + square.side/2)){
+        cout << message::brick_outside(square.center.x, square.center.y);
         return 1;
     }
 
-    if (c<brick_size_min){
-        cout << message::invalid_brick_size(c);
+    // if (c<brick_size_min){
+    if (square.side<brick_size_min){
+        cout << message::invalid_brick_size(square.side);
+        // cout << message::invalid_brick_size(c);
         return 1;
     }
 
@@ -39,35 +46,39 @@ int Brick::check_Brick(){
 }
 
 bool Brick::collision_brick (const Brick& other) const {
-    double dx = abs(x - other.x);
-    double dy = abs(y - other.y);
-    double limit = (c + other.c) / 2.0;
+    // double dx = abs(x - other.x);
+    // double dy = abs(y - other.y);
+    // double limit = (c + other.c) / 2.0;
 
-    return (dx < limit && dy < limit);
+    // return (dx < limit && dy < limit);
+     return brick_intersects_brick(*this, other);
 }
 
 // VOIR SI ON PEUT OPTMISER !!
-bool Brick::collision_paddle (const Paddle& p) const { 
-    double half = c / 2.0;
+// bool Brick::collision_paddle (const Paddle& p) const { 
+//     double half = c / 2.0;
 
-    // bornes du carré
-    double left   = x - half;
-    double right  = x + half;
-    double bottom = y - half;
-    double top    = y + half;
+//     // bornes du carré
+//     double left   = x - half;
+//     double right  = x + half;
+//     double bottom = y - half;
+//     double top    = y + half;
 
-    // centre du cercle
-    double cx = p.getX();
-    double cy = p.getY();
-    double r  = p.getR();
+//     // centre du cercle
+//     double cx = p.getX();
+//     double cy = p.getY();
+//     double r  = p.getR();
 
-    // point du carré le plus proche du centre du cercle
-    double closestX = std::max(left, std::min(cx, right));
-    double closestY = std::max(bottom, std::min(cy, top));
+//     // point du carré le plus proche du centre du cercle
+//     double closestX = std::max(left, std::min(cx, right));
+//     double closestY = std::max(bottom, std::min(cy, top));
 
-    // distance au carré
-    double dx = cx - closestX;
-    double dy = cy - closestY;
+//     // distance au carré
+//     double dx = cx - closestX;
+//     double dy = cy - closestY;
 
-    return (dx*dx + dy*dy) < (r*r);
+//     return (dx*dx + dy*dy) < (r*r);
+// }
+bool Brick::collision_paddle (const Paddle& p) const {
+    return brick_intersects_paddle(*this, p);
 }

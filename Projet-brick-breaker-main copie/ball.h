@@ -1,6 +1,8 @@
 #ifndef BALL_H
 #define BALL_H
 
+#include "tools.h"
+
 class Brick;
 class Paddle;
 
@@ -11,13 +13,13 @@ class Ball{
         bool collision_ball (const Ball& other) const;
         bool collision_brick (const Brick& b) const;
         bool collision_paddle (const Paddle& p) const;
-        double getX() const { return x; }
-        double getY() const { return y; }
-        double getR() const { return r; }
-        void clear() { x = 0; y = 0; r = 0; dx = 0; dy = 0; }
+        double getX() const { return circle.center.x; }
+        double getY() const { return circle.center.y; }
+        double getR() const { return circle.r; }
+        const Circle& getCircle() const { return circle; }
+        void clear() { circle = {{0,0}, 0}; dx = 0; dy = 0; }
     private:
-        double x,y; // position 
-        double r; //rayon
+        Circle circle;
         double dx,dy;// vecteur deplacement
 
 };

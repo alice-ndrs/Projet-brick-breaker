@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Paddle.h"
+#include "tools.h"
 using namespace std;
 
 #ifndef BRICK_H
@@ -11,14 +12,14 @@ class Brick{
         int check_Brick();
         bool collision_brick (const Brick& other) const; //check what does const mean
         bool collision_paddle (const Paddle& p) const;
-        double getX() const { return x; }
-        double getY() const { return y; }
-        double getC() const { return c; }
-        void clear() { t = 0; x= 0; y = 0; c = 0; h = 0; }
+        double getX() const { return square.center.x; }
+        double getY() const { return square.center.y; }
+        double getC() const { return square.side; }
+        const Square& getSquare() const { return square; }
+        void clear() { t = 0; square = {{0,0}, 0}; h = 0; }
     protected:
         double t;// type de brick parmis les 3
-        double x,y;// position 
-        double c;// taille des cotés
+        Square square;// position et taille
         double h; // niveau de resistance
 };
 

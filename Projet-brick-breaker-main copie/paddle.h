@@ -1,16 +1,18 @@
 #ifndef PADDLE_H
 #define PADDLE_H
 
+#include "tools.h"
+
 class Paddle {
     public:
         Paddle (double x = 0,double y = 0, double r = 0); // constructeur par défaut
         int check_Paddle();
-        double getX() const { return x; }
-        double getY() const { return y; }
-        double getR() const { return r; }
+        double getX() const { return circle.center.x; }
+        double getY() const { return circle.center.y; }
+        double getR() const { return circle.r; }
+        const Circle& getCircle() const { return circle; }
     private:
-        double x,y; //position
-        double r;// rayon 
+        Circle circle;
 };
 
 #endif

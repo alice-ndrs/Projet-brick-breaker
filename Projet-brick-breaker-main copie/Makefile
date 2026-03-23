@@ -2,7 +2,7 @@
 
 CXX     = g++
 CXXFLAGS = -g -Wall -std=c++11
-CXXFILES = Project.cc Ball.cc Brick.cc Paddle.cc Game.cc Message.cc Rainbow_Brick.cc
+CXXFILES = Project.cc Ball.cc Brick.cc Paddle.cc Game.cc Message.cc tools.cc
 OBJ = $(CXXFILES:.cc=.o)
 
 
