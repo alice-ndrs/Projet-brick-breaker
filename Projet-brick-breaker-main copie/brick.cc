@@ -11,7 +11,7 @@ Brick :: Brick (double t, double x, double y, double c, double h ):
 t(t), square{{x,y}, c}, h(h)
 {}
 
-int Brick::check_Brick(){
+int Brick::check_Brick(){ // mettre en booléen
     if (t>2 or t<0){
         cout << message::invalid_brick_type(t);
         return 1;
@@ -51,7 +51,7 @@ bool Brick::collision_brick (const Brick& other) const {
     // double limit = (c + other.c) / 2.0;
 
     // return (dx < limit && dy < limit);
-     return brick_intersects_brick(*this, other);
+     return square_intersects_square(square, other.square);
 }
 
 // VOIR SI ON PEUT OPTMISER !!
@@ -80,5 +80,5 @@ bool Brick::collision_brick (const Brick& other) const {
 //     return (dx*dx + dy*dy) < (r*r);
 // }
 bool Brick::collision_paddle (const Paddle& p) const {
-    return brick_intersects_paddle(*this, p);
+    return square_intersects_circle(square, p.getCircle());
 }

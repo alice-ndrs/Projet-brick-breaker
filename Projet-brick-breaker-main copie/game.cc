@@ -63,11 +63,11 @@ bool Game::getLevel(const string& filename){ // méthode de lecture de fichier
         string line;
         while (getline(file>>ws, line)) {
             if (line.empty()) continue;
-            if(line[0]=='#')  continue;
+            if (line[0]=='#') continue;
 
             istringstream data(line);
 
-            if(decodage_ligne(data) == false)
+            if (decodage_ligne(data) == false)
                 return false;
         }
         if (etat != FIN) return false;
@@ -140,7 +140,7 @@ bool Game::decodage_brick(istringstream& data) {
 
     if (!(data >> t >> x >> y >> c)) return false;
 
-    if (t == 0) {
+    if (t == 0) { // mettre un switch case ici
         int h;
         if (!(data >> h)) return false;
 

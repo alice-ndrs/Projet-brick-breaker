@@ -37,7 +37,7 @@ bool Ball::collision_ball (const Ball& other) const {
     // double radius_sum = r + other.r;
 
     // return distance_sq < radius_sum * radius_sum;
-    return ball_intersects_ball(*this, other);
+    return circle_intersects_circle(circle, other.circle);
 }
 
 bool Ball::collision_brick (const Brick& b) const {
@@ -55,7 +55,7 @@ bool Ball::collision_brick (const Brick& b) const {
     // double dy = y - closestY;
 
     // return (dx*dx + dy*dy) < (r * r);
-    return ball_intersects_brick(*this, b);
+    return circle_intersects_square(circle, b.getSquare());
 }
 
 bool Ball::collision_paddle (const Paddle& paddle) const { 
@@ -66,5 +66,5 @@ bool Ball::collision_paddle (const Paddle& paddle) const {
     // double radius_sum = r + paddle.getR();
 
     // return distance_sq < radius_sum * radius_sum;
-    return ball_intersects_paddle(*this, paddle);
+    return circle_intersects_circle(circle, paddle.getCircle());
 }

@@ -1,14 +1,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-#include "Message.h"
-#include "Constants.h"
-using namespace std;
-
-class Ball;
-class Brick;
-class Paddle;
-
 struct Point {
     double x;
     double y;
@@ -24,11 +16,9 @@ struct Square {
     double side;
 };
 
-bool intersects(const Square& s1, const Square& s2);
-bool brick_intersects_brick(const Brick& b1, const Brick& b2);
-bool ball_intersects_ball(const Ball& ball1, const Ball& ball2);
-bool ball_intersects_brick(const Ball& ball, const Brick& brick);
-bool ball_intersects_paddle(const Ball& ball, const Paddle& paddle);
-bool brick_intersects_paddle(const Brick& brick, const Paddle& paddle);
+bool circle_intersects_circle(const Circle& c1, const Circle& c2);
+bool square_intersects_square(const Square& s1, const Square& s2);
+bool circle_intersects_square(const Circle& c, const Square& s);
+bool square_intersects_circle(const Square& s, const Circle& c);
 
 #endif

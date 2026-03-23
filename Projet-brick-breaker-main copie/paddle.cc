@@ -25,7 +25,7 @@ int Paddle::check_Paddle(){
     double dx_squared = circle.r * circle.r - circle.center.y * circle.center.y; 
     if (dx_squared < 0) {
         cout << message::paddle_outside(circle.center.x, circle.center.y);
-        return 1;
+        return 1; // REDONDANT
     }
 
     double dx = sqrt(dx_squared);

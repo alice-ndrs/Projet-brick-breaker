@@ -20,7 +20,7 @@ class Brick{
     protected:
         double t;// type de brick parmis les 3
         Square square;// position et taille
-        double h; // niveau de resistance
+        double h; // niveau de resistance SERT A RIEN LA 
 };
 
 class Rainbow_brick : public Brick {
