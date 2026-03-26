@@ -9,7 +9,8 @@ Paddle::Paddle (double x,double y, double r):
 circle{{x,y}, r}
 {}
 
-int Paddle::check_Paddle(){
+int Paddle::check_Paddle() const
+{
     if (circle.center.y > 0) {
         cout << message::paddle_outside(circle.center.x, circle.center.y);
         return 1;

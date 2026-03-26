@@ -6,7 +6,7 @@
 class Paddle {
     public:
         Paddle (double x = 0,double y = 0, double r = 0); // constructeur par défaut
-        int check_Paddle();
+        int check_Paddle() const;
         double getX() const { return circle.center.x; }
         double getY() const { return circle.center.y; }
         double getR() const { return circle.r; }

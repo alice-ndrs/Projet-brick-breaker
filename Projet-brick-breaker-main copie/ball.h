@@ -2,14 +2,17 @@
 #define BALL_H
 
 #include "tools.h"
+#include "Constants.h"
 
 class Brick;
 class Paddle;
 
-class Ball{
+class Ball 
+{
     public:
         Ball (double x,double y,double r,double dx,double dy);
-        int check_Ball ();
+        virtual ~Ball() = default;
+        int check_Ball () const;
         bool collision_ball (const Ball& other) const;
         bool collision_brick (const Brick& b) const;
         bool collision_paddle (const Paddle& p) const;
@@ -21,6 +24,6 @@ class Ball{
     private:
         Circle circle;
         double dx,dy;// vecteur deplacement
-
 };
+
 #endif

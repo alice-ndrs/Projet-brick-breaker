@@ -3,82 +3,50 @@
 #include "Message.h"
 #include "Constants.h"
 #include "Paddle.h"
-#include <cmath>
 using namespace std;
 
 
-Brick :: Brick (double t, double x, double y, double c, double h ):
-t(t), square{{x,y}, c}, h(h)
+Brick::Brick(BrickType t, double x, double y, double c) :
+    t(t), square{{x,y}, c}
 {}
 
-int Brick::check_Brick(){ // mettre en booléen
-    if (t>2 or t<0){
-        cout << message::invalid_brick_type(t);
+int Brick::check_Brick() const // mettre en booléen
+{ 
+    int type_value = static_cast<int>(t);
+    if (type_value < 0 || type_value > 2) {
+        cout << message::invalid_brick_type(type_value);
         return 1;
     }
     
-    // if ((x - c/2 < 0 || arena_size < x + c/2) ||
-    // (y - c/2 < 0 || arena_size < y + c/2)){
-    //     cout << message::brick_outside(x,y);
-    //     return 1;
-    // }
     if ((square.center.x - square.side/2 < 0 || arena_size < square.center.x + square.side/2) ||
-    (square.center.y - square.side/2 < 0 || arena_size < square.center.y + square.side/2)){
+    (square.center.y - square.side/2 < 0 || arena_size < square.center.y + square.side/2)) {
         cout << message::brick_outside(square.center.x, square.center.y);
         return 1;
     }
 
-    // if (c<brick_size_min){
-    if (square.side<brick_size_min){
+    if (square.side<brick_size_min) {
         cout << message::invalid_brick_size(square.side);
-        // cout << message::invalid_brick_size(c);
         return 1;
     }
 
-    if (t==0) {
-        if (h<1 || h>7){
-            cout << message::invalid_hit_points(h);
-            return 1;
-        }
-    }
+    return check_specific();
+}
 
+int Rainbow_brick::check_specific() const 
+{
+    if (hit_points<1 || hit_points>7) {
+        cout << message::invalid_hit_points(hit_points);
+        return 1;
+    }
     return 0;
 }
 
-bool Brick::collision_brick (const Brick& other) const {
-    // double dx = abs(x - other.x);
-    // double dy = abs(y - other.y);
-    // double limit = (c + other.c) / 2.0;
-
-    // return (dx < limit && dy < limit);
-     return square_intersects_square(square, other.square);
+bool Brick::collision_brick (const Brick& other) const 
+{
+    return square_intersects_square(square, other.square);
 }
 
-// VOIR SI ON PEUT OPTMISER !!
-// bool Brick::collision_paddle (const Paddle& p) const { 
-//     double half = c / 2.0;
-
-//     // bornes du carré
-//     double left   = x - half;
-//     double right  = x + half;
-//     double bottom = y - half;
-//     double top    = y + half;
-
-//     // centre du cercle
-//     double cx = p.getX();
-//     double cy = p.getY();
-//     double r  = p.getR();
-
-//     // point du carré le plus proche du centre du cercle
-//     double closestX = std::max(left, std::min(cx, right));
-//     double closestY = std::max(bottom, std::min(cy, top));
-
-//     // distance au carré
-//     double dx = cx - closestX;
-//     double dy = cy - closestY;
-
-//     return (dx*dx + dy*dy) < (r*r);
-// }
-bool Brick::collision_paddle (const Paddle& p) const {
+bool Brick::collision_paddle (const Paddle& p) const 
+{
     return square_intersects_circle(square, p.getCircle());
 }

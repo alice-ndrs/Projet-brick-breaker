@@ -2,10 +2,12 @@
 #define Game_H
 #include <iostream>
 #include <vector>
+#include <memory>
 #include "Brick.h"
 #include "Ball.h"
 #include "Paddle.h"
 #include <string>
+#include <sstream>
 
 enum EtatLecture {
     SCORE,
@@ -18,7 +20,8 @@ enum EtatLecture {
     FIN
 };
 
-class Game{
+class Game
+{
     public:
         Game (int lives = 0,int score = 0);
         bool getLevel (const std::string& filename); // déclaration de la fn de lecture de fichier
@@ -43,8 +46,8 @@ class Game{
     private:
         int lives;
         int score;
-        vector <Brick> bricks;
-        vector <Ball> balls;
+        std::vector<std::unique_ptr<Brick>> bricks;
+        std::vector<std::unique_ptr<Ball>> balls;
         Paddle paddle;
         EtatLecture etat;
         unsigned int total;
