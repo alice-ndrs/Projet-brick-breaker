@@ -27,7 +27,7 @@ void Game::reset()
     paddle = Paddle();
 }
 
-void Game::nettoyer_objets() 
+void Game::nettoyer_objets() // pour les rendus suivants
 {
     for (size_t i = 0; i < balls.size(); ) {
         if (balls[i]->clear()) {
@@ -199,12 +199,14 @@ bool Game::decodage_brick(istringstream& data)
             break;
         }
         case 1: {
+            if (!is_line_empty(data)) return false;
             std::unique_ptr<Ball_brick> b(new Ball_brick(x, y, c));
             if (b->check_Brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
         case 2: {
+            if (!is_line_empty(data)) return false;
             std::unique_ptr<Split_brick> b(new Split_brick(x, y, c));
             if (b->check_Brick()) return false;
             bricks.push_back(std::move(b));

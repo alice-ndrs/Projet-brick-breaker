@@ -17,7 +17,7 @@ int Ball::check_Ball () const   //verifie si Ball est dans l'arene et
     bool outside_x = (circle.center.x - circle.r < 0) 
                     || (circle.center.x + circle.r > arena_size);
 
-    bool outside_y = (circle.center.y - circle.r < 0) 
+    bool outside_y = (circle.center.y < 0) 
                     || (circle.center.y + circle.r > arena_size);
               
     if (outside_x || outside_y){
@@ -25,7 +25,7 @@ int Ball::check_Ball () const   //verifie si Ball est dans l'arene et
         return 1;
     }
 
-    if(sqrt(dx*dx+dy*dy)>delta_norm_max){ // verification norme delta
+    if(sqrt(dx*dx + dy*dy)>delta_norm_max){ // verification norme delta
         cout << message::invalid_delta(dx,dy);
         return 1;
     }
