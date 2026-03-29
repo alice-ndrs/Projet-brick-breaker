@@ -2,6 +2,7 @@
 #include "Paddle.h"
 #include "Message.h"
 #include "Constants.h"
+#include <cmath>
 using namespace std;
 
 //------------- Constructeur Paddle -------------

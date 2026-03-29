@@ -63,7 +63,7 @@ class Ball_brick : public Brick
     public :
         Ball_brick(double x, double y, double c);
     private :
-        double new_ball_radius; // rayon de Ball à creer
+        double new_ball_radius; // (rendu 2) rayon de Ball à creer
 };
 
 
@@ -72,7 +72,7 @@ class Split_brick : public Brick
     public :
         Split_brick(double x, double y, double c);
     private :
-        double split_brick_gap;// parametre pour la de separation
+        double split_brick_gap;// (rendu 2) parametre pour la de separation
 };
 
 #endif
