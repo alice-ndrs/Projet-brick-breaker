@@ -38,6 +38,7 @@ class Game
         bool collision_brick_paddle() const;
 
         void reset();  // reinitialise l'etat du jeu
+        void nettoyer_objets();
         bool decodage_ligne(std::istringstream& data);
 
         // --- Méthodes de décodage spécifiques ---

@@ -27,6 +27,25 @@ void Game::reset()
     paddle = Paddle();
 }
 
+void Game::nettoyer_objets() 
+{
+    for (size_t i = 0; i < balls.size(); ) {
+        if (balls[i]->clear()) {
+            balls.erase(balls.begin() + i); 
+        }else{
+            i++;
+        }
+    }
+
+    for (size_t i = 0; i < bricks.size();) {
+        if (bricks[i]->clear()) {
+            bricks.erase(bricks.begin() + i);
+        } else{
+            i++;
+        }
+    }
+}
+
 // cette fonction recoit un ligne de donnee puis decider quelle methode
 // appeler
 bool Game::decodage_ligne(istringstream& data)

@@ -29,7 +29,7 @@ class Ball
 
         void reset(const Paddle& p);  // repositionnement de la ball si lives>0
         void inactive() { active=false; }// desactive la Ball
-        bool clear() {return active; } // indique si la Ball est conservée
+        bool clear() {return !active; } // indique si la Ball est conservée
 
     private:
         Circle circle;
