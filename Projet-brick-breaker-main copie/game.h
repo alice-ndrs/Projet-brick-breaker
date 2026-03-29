@@ -1,15 +1,14 @@
 #ifndef Game_H
 #define Game_H
-#include <iostream>
 #include <vector>
 #include <memory>
-#include "Brick.h"
 #include "Ball.h"
+#include "Brick.h"  
 #include "Paddle.h"
-#include <string>
 #include <sstream>
 
-enum EtatLecture {
+
+enum EtatLecture {// differente lecture
     SCORE,
     LIVES,
     PADDLE,
@@ -20,21 +19,28 @@ enum EtatLecture {
     FIN
 };
 
+//------------- Classe principale (logique globale du jeu) -------------
+
 class Game
 {
     public:
         Game (int lives = 0,int score = 0);
-        bool getLevel (const std::string& filename); // déclaration de la fn de lecture de fichier
-        int check_Collisions () const;
+        virtual ~Game()=default;
+
+        bool getLevel (const std::string& filename); // déclaration de la 
+                                                        //fin de lecture de fichier
+        // --- Gestion des collisions ---
+        int check_Collisions () const;              
         bool collision_bricks() const;
         bool collision_balls() const;
         bool collision_ball_brick() const;
         bool collision_ball_paddle() const;
         bool collision_brick_paddle() const;
-        void reset();
+
+        void reset();  // reinitialise l'etat du jeu
         bool decodage_ligne(std::istringstream& data);
 
-        //méthodes à écrire dans game.cc
+        // --- Méthodes de décodage spécifiques ---
         bool decodage_score(std::istringstream& data);
         bool decodage_lives(std::istringstream& data);
         bool decodage_paddle(std::istringstream& data);
@@ -43,12 +49,18 @@ class Game
         bool decodage_nb_balls(std::istringstream& data);
         bool decodage_ball(std::istringstream& data);
 
+
+        bool is_line_empty(std::istringstream& data);//verifie la ligne lue est
+                                          //vide ou ne contient que des espaces
     private:
         int lives;
         int score;
+
         std::vector<std::unique_ptr<Brick>> bricks;
         std::vector<std::unique_ptr<Ball>> balls;
-        Paddle paddle;
+
+        Paddle paddle; // la raquette du joueur
+
         EtatLecture etat;
         unsigned int total;
         unsigned int count;

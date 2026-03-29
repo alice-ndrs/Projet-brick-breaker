@@ -6,6 +6,7 @@
 
 class Paddle;
 
+//enum differents types de Brick
 enum class BrickType
 {
     RAINBOW = 0,
@@ -13,49 +14,65 @@ enum class BrickType
     SPLIT = 2
 };
 
+
 class Brick 
 {
     public:
         Brick(BrickType t, double x, double y, double c);
-        virtual ~Brick() = default;
+        virtual ~Brick() = default;// destructeur virtuel par defaut
+
         int check_Brick() const;
         virtual int check_specific() const { return 0; }
+
+        // --- Détection de collisions ---
         bool collision_brick (const Brick& other) const;
         bool collision_paddle (const Paddle& p) const;
+
+        // --- Accesseurs ---
         double getX() const { return square.center.x; }
         double getY() const { return square.center.y; }
         double getC() const { return square.side; }
         const Square& getSquare() const { return square; }
         BrickType getType() const { return t; }
-        void clear() { t = BrickType::RAINBOW; square = {{0,0}, 0}; }
+
+        virtual void hit () { remove = true; } //virtual permet de regarder 
+        bool clear() const { return remove; }         // les points de vies
+
     protected:
-        BrickType t;// type de brick parmis les 3
+        BrickType t; // type de brick parmis les 3
         Square square;// position et taille
-};
+        bool remove; //true si la brick est a enlever
+};  
+
+//------ Sous-classes de Brick ------
 
 class Rainbow_brick : public Brick 
 {
     public :
-        Rainbow_brick(double x, double y, double c, int h) : Brick(BrickType::RAINBOW, x, y, c), hit_points(h) {}
+        Rainbow_brick(double x, double y, double c, int h);
         int check_specific() const override;
+        void hit() override; //surcharge pour decrementer les vies 
+                            // avant de la detruire
     private : 
-        int hit_points;
+        int hit_points; // nbre de coups necessaires pour la casser
 };
+
 
 class Ball_brick : public Brick 
 {
     public :
-        Ball_brick(double x, double y, double c) : Brick(BrickType::BALL, x, y, c), new_ball_radius(::new_ball_radius) {}
+        Ball_brick(double x, double y, double c);
     private :
-        double new_ball_radius;
+        double new_ball_radius; // rayon de Ball à creer
 };
+
 
 class Split_brick : public Brick 
 {
     public :
-        Split_brick(double x, double y, double c) : Brick(BrickType::SPLIT, x, y, c), split_brick_gap(::split_brick_gap) {}
+        Split_brick(double x, double y, double c);
     private :
-        double split_brick_gap;
+        double split_brick_gap;// parametre pour la de separation
 };
 
 #endif

@@ -1,21 +1,20 @@
 #include <iostream>
-#include <cmath>
 #include <vector>
 #include <memory>
 #include "Game.h"
 #include "Message.h"
 #include "Brick.h"
-#include "Ball.h"
-#include "Paddle.h"
 #include <fstream>
 #include <sstream>
-#include "Constants.h"
 using namespace std;
+
+//------------- Constructeur Game -------------
 
 Game::Game (int lives,int score):
 lives(lives),score(score), paddle(), etat(SCORE), total(0), count(0)
 {}
 
+//reinitialise l'etat du jeu
 void Game::reset() 
 {
     etat = SCORE;
@@ -28,10 +27,12 @@ void Game::reset()
     paddle = Paddle();
 }
 
+// cette fonction recoit un ligne de donnee puis decider quelle methode
+// appeler
 bool Game::decodage_ligne(istringstream& data)
 {
     switch (etat) {
-        case SCORE:
+        case SCORE:    
             return decodage_score(data);
 
         case LIVES:
@@ -59,14 +60,15 @@ bool Game::decodage_ligne(istringstream& data)
     return false;
 }
 
+
 bool Game::getLevel(const string& filename) // méthode de lecture de fichier
 { 
-    reset();
+    reset();  // On repart de zero avant de charger
 
     ifstream file(filename);
     if (!file.fail()) 
     {
-        string line;
+        string line; // lecture ligne par ligne en ignorant les espaces
         while (getline(file>>ws, line)) {
             if (line.empty()) continue;
             if (line[0]=='#') continue;
@@ -87,6 +89,8 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
     return false;
 }
 
+//------------- Fonctions de Décodage Spécifiques -------------
+
 bool Game::decodage_score(istringstream& data) 
 {
     int score;
@@ -96,15 +100,19 @@ bool Game::decodage_score(istringstream& data)
         cout << message::invalid_score(score);
         return false;
     }
+
+    if (!is_line_empty(data)) return false;
     this->score = score;
     etat = LIVES;
     return true;
 }
 
+
 bool Game::decodage_lives(istringstream& data) 
 {
     int lives;
     if (!(data >> lives)) return false;
+    if (!is_line_empty(data)) return false;
 
     if (lives < 0) {
         cout << message::invalid_lives(lives);
@@ -116,23 +124,27 @@ bool Game::decodage_lives(istringstream& data)
     return true;
 }   
 
+
 bool Game::decodage_paddle(istringstream& data) 
 {
     double xPaddle, yPaddle, rPaddle;
     if (!(data >> xPaddle >> yPaddle >> rPaddle)) return false;
+    if (!is_line_empty(data)) return false;
     
     Paddle p(xPaddle, yPaddle, rPaddle);
-    if (p.check_Paddle()) return false;
+    if (p.check_Paddle()) return false; // limites arene
     
     this->paddle = p;
     etat = NB_BRICKS;
     return true;
 }
 
+
 bool Game::decodage_nb_bricks(istringstream& data) 
 {
     int nb_brick;
     if (!(data >> nb_brick)) return false;
+    if (!is_line_empty(data)) return false;
 
     if (nb_brick < 0) {
         return false;
@@ -140,7 +152,7 @@ bool Game::decodage_nb_bricks(istringstream& data)
 
     total = nb_brick;
     count = 0;
-
+    // si 0 briques -> on saute à la lecture des Ball
     if (nb_brick == 0) {
         etat = NB_BALLS;
     } else {
@@ -149,17 +161,19 @@ bool Game::decodage_nb_bricks(istringstream& data)
     return true;
 }
 
+
 bool Game::decodage_brick(istringstream& data) 
 {
-    int t;
-    double x, y, c;
+    int t;      // type
+    double x, y, c; // position et cote
 
     if (!(data >> t >> x >> y >> c)) return false;
 
     switch (t) {
-        case 0: {
+        case 0: { // Rainbow_brick-> paramètre supplémentaire (hit_points)
             int h;
             if (!(data >> h)) return false;
+            if (!is_line_empty(data)) return false;
             std::unique_ptr<Rainbow_brick> b(new Rainbow_brick(x, y, c, h));
             if (b->check_Brick()) return false;
             bricks.push_back(std::move(b));
@@ -191,10 +205,12 @@ bool Game::decodage_brick(istringstream& data)
     return true;
 }
 
+
 bool Game::decodage_nb_balls(istringstream& data) 
 {
     int nb_ball;
     if (!(data >> nb_ball)) return false;
+    if (!is_line_empty(data)) return false;
     
     if (nb_ball < 0) return false;
     
@@ -209,10 +225,12 @@ bool Game::decodage_nb_balls(istringstream& data)
     return true;
 }
 
+
 bool Game::decodage_ball(istringstream& data) 
 {
     double xBall, yBall, rBall, dx, dy;
     if (!(data >> xBall >> yBall >> rBall >> dx >> dy)) return false;
+    if (!is_line_empty(data)) return false;
 
     std::unique_ptr<Ball> b(new Ball(xBall, yBall, rBall, dx, dy));
     if (b->check_Ball()) {
@@ -227,6 +245,7 @@ bool Game::decodage_ball(istringstream& data)
     return true;
 }
 
+//------------- Gestion des collisions -------------
 
 int Game::check_Collisions() const 
 {
@@ -237,6 +256,7 @@ int Game::check_Collisions() const
     if(collision_brick_paddle()) return 1;
     return 0;
 }
+
 
 bool Game::collision_bricks() const 
 {
@@ -251,6 +271,7 @@ bool Game::collision_bricks() const
     return false;
 }
 
+
 bool Game::collision_balls() const 
 {
     for (size_t i = 0; i < balls.size(); ++i) {
@@ -263,6 +284,7 @@ bool Game::collision_balls() const
     }
     return false;
 }
+
 
 bool Game::collision_ball_brick() const 
 {
@@ -277,6 +299,7 @@ bool Game::collision_ball_brick() const
     return false;
 }
 
+
 bool Game::collision_ball_paddle() const 
 {
     for (size_t i = 0; i < balls.size(); ++i) {
@@ -288,6 +311,7 @@ bool Game::collision_ball_paddle() const
     return false;
 }
 
+
 bool Game::collision_brick_paddle() const
 {
     for (size_t i = 0; i < bricks.size(); ++i) {
@@ -297,4 +321,10 @@ bool Game::collision_brick_paddle() const
         }
     }
     return false;
+}
+
+
+bool Game::is_line_empty(istringstream& data){
+    data>>ws;               // White space: on evite les espaces 
+    return data.eof();      //return false si il rest du text
 }

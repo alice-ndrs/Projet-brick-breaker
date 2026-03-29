@@ -12,7 +12,7 @@ project: $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o project
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-#pas sur de la ligne au dessus
+
 # Definitions de cibles particulieres
 
 depend:
@@ -28,11 +28,11 @@ clean:
 	@/bin/rm -f *.o *.x *.cc~ *.h~ project
 
 # DO NOT DELETE THIS LINE
-Project.o: Project.cc Game.h Brick.h Paddle.h Ball.h
-Ball.o: Ball.cc Ball.h Constants.h tools.h Message.h Brick.h Paddle.h
-Brick.o: Brick.cc Brick.h Paddle.h Message.h Constants.h tools.h
-Paddle.o: Paddle.cc Paddle.h Message.h Constants.h tools.h
-Game.o: Game.cc Game.h Brick.h Paddle.h Ball.h Message.h Constants.h \
-  tools.h
+Project.o: Project.cc Game.h Ball.h tools.h Paddle.h
+Ball.o: Ball.cc Ball.h tools.h Paddle.h Brick.h Constants.h Message.h
+Brick.o: Brick.cc Brick.h tools.h Constants.h Message.h Paddle.h
+Paddle.o: Paddle.cc Paddle.h tools.h Message.h Constants.h
+Game.o: Game.cc Game.h Ball.h tools.h Paddle.h Message.h Brick.h \
+  Constants.h
 Message.o: Message.cc Message.h
-Rainbow_Brick.o: Rainbow_Brick.cc Rainbow_Brick.h Brick.h Paddle.h
+tools.o: tools.cc tools.h

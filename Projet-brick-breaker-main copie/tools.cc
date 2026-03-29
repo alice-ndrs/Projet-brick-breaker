@@ -1,8 +1,8 @@
 #include "tools.h"
 #include <cmath>
 #include <algorithm>
-using namespace std;
 
+//collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2)
 {
     double dx = c1.center.x - c2.center.x;
@@ -13,6 +13,7 @@ bool circle_intersects_circle(const Circle& c1, const Circle& c2)
     return distance_sq < radius_sum * radius_sum;
 }
 
+//collision carre contre carre
 bool square_intersects_square(const Square& s1, const Square& s2)
 {
     double dx = std::abs(s1.center.x - s2.center.x);
@@ -22,6 +23,7 @@ bool square_intersects_square(const Square& s1, const Square& s2)
     return (dx < limit && dy < limit);
 }
 
+//collision cercle contre carre
 bool circle_intersects_square(const Circle& c, const Square& s)
 {
     double half = s.side / 2.0;
@@ -40,6 +42,7 @@ bool circle_intersects_square(const Circle& c, const Square& s)
     return (dx * dx + dy * dy) < (c.r * c.r);
 }
 
+//collision carre contre cercle
 bool square_intersects_circle(const Square& s, const Circle& c)
 {
     return circle_intersects_square(c, s);
