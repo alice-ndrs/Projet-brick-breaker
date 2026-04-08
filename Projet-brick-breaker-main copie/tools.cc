@@ -1,6 +1,8 @@
 #include "tools.h"
 #include <cmath>
 #include <algorithm>
+#include "Constants.h"
+#include <cairomm/context.h>
 
 //collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2)
@@ -46,4 +48,28 @@ bool circle_intersects_square(const Circle& c, const Square& s)
 bool square_intersects_circle(const Square& s, const Circle& c)
 {
     return circle_intersects_square(c, s);
+}
+
+// Dessine un cercle
+void draw_circle(const Cairo::RefPtr<Cairo::Context>& cr, const Circle& c)
+{
+    cr->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
+    cr->fill();
+}
+
+// Dessine un carré 
+void draw_square(const Cairo::RefPtr<Cairo::Context>& cr, const Square& s)
+{
+    double half = s.side / 2.0;
+    cr->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
+    cr->fill();
+}
+
+// Dessine l'arène 
+void draw_arena(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    cr->set_source_rgb(0.0, 0.0, 0.0); 
+    cr->set_line_width(2.0);
+    cr->rectangle(0, 0, arena_size, arena_size);
+    cr->stroke();
 }

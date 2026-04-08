@@ -53,6 +53,10 @@ class Game
 
         bool is_line_empty(std::istringstream& data);//verifie la ligne lue est
                                           //vide ou ne contient que des espaces
+        
+        const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
+        const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
+        const Paddle& get_paddle() const { return paddle; }
     private:
         int lives;
         int score;

@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "graphic.h"
+#include <gtkmm/application.h>
 
 int main(int argc, char* argv[]) 
 {
@@ -12,5 +14,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    return 0;
+    auto app = Gtk::Application::create("org.brickbreaker");
+    Graphic gui;
+    
+    gui.set_game(&game); 
+    app->signal_activate().connect([&]() {
+        app->add_window(gui);
+        gui.show(); 
+    });
+
+    return app->run(0, nullptr);
 };
