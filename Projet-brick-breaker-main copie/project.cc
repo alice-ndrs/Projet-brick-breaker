@@ -1,27 +1,24 @@
-#include "Game.h"
-#include "graphic.h"
 #include <gtkmm/application.h>
+#include <string>
+#include "gui.h"
 
 int main(int argc, char* argv[]) 
 {
-    Game game;
+    //Game game;
 
-    if (argc < 2) return 1;
+    //if (argc < 2) return 1;
 
-    std::string filename = argv[1];
+    //std::string filename = argv[1];
 
-    if (!game.getLevel(filename)) {
-        return 1;
+    //if (!game.getLevel(filename)) {
+        //return 1;
+    //}
+
+    std::string file_name("");
+    if (argc > 1)
+    {
+        file_name = argv[1];
     }
-
-    auto app = Gtk::Application::create("org.brickbreaker");
-    Graphic gui;
-    
-    gui.set_game(&game); 
-    app->signal_activate().connect([&]() {
-        app->add_window(gui);
-        gui.show(); 
-    });
-
-    return app->run(0, nullptr);
+    auto app = Gtk::Application::create();
+    return app->make_window_and_run<My_window>(1, argv, file_name);
 };

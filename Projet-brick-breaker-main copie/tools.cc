@@ -1,8 +1,10 @@
 #include "tools.h"
+#include "graphic_gui.h"
 #include <cmath>
 #include <algorithm>
 #include "Constants.h"
-#include <cairomm/context.h>
+
+extern const Cairo::RefPtr<Cairo::Context>* ptcr;
 
 //collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2)
@@ -51,25 +53,25 @@ bool square_intersects_circle(const Square& s, const Circle& c)
 }
 
 // Dessine un cercle
-void draw_circle(const Cairo::RefPtr<Cairo::Context>& cr, const Circle& c)
+void draw_circle (const Circle& c)
 {
-    cr->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
-    cr->fill();
+    (*ptcr)->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
+    (*ptcr)->fill();
 }
 
 // Dessine un carré 
-void draw_square(const Cairo::RefPtr<Cairo::Context>& cr, const Square& s)
+void draw_square (const Square& s)
 {
     double half = s.side / 2.0;
-    cr->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
-    cr->fill();
+    (*ptcr)->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
+    (*ptcr)->fill();
 }
 
 // Dessine l'arène 
-void draw_arena(const Cairo::RefPtr<Cairo::Context>& cr)
+void draw_arena ()
 {
-    cr->set_source_rgb(0.0, 0.0, 0.0); 
-    cr->set_line_width(2.0);
-    cr->rectangle(0, 0, arena_size, arena_size);
-    cr->stroke();
+    (*ptcr)->set_source_rgb(0.0, 0.0, 0.0);
+    (*ptcr)->set_line_width(2.0);
+    (*ptcr)->rectangle(0, 0, arena_size, arena_size);
+    (*ptcr)->stroke();
 }

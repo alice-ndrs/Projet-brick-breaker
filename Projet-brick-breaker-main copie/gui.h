@@ -4,14 +4,19 @@
 #include <array>
 #include <gtkmm.h>
 #include <string>
+#include "Game.h"
 
 
 class My_window : public Gtk::Window
 {
 public:
+    using Gtk::Window::Window;
     My_window(std::string file_name);
 
 private:
+    Game* m_game = nullptr;
+    std::string last_file;
+
     Gtk::Box main_box, panel_box, command_box;
     Gtk::Grid info_grid;
     bool loop_activated;

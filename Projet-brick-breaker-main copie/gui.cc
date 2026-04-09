@@ -1,6 +1,6 @@
 #include <filesystem>
 #include <iostream>
-#include "constants.h"
+#include "Constants.h"
 #include "graphic_gui.h"
 #include "gui.h"
 
@@ -29,8 +29,10 @@ My_window::My_window(string file_name)
       command_box(Gtk::Orientation::VERTICAL), loop_activated(false),
       buttons({Gtk::Button("exit"), Gtk::Button("open"), Gtk::Button("save"),
                Gtk::Button("restart"), Gtk::Button("start"), Gtk::Button("step")}),
-      info_frame("Infos :"), info_text({Gtk::Label("score:"), Gtk::Label("lives:"),
-                                        Gtk::Label("bricks:"), Gtk::Label("balls:")})
+      info_frame("Infos :"), 
+      info_text({Gtk::Label("score:"), Gtk::Label("lives:"),
+                                        Gtk::Label("bricks:"), Gtk::Label("balls:")}),
+    m_game(new Game()), last_file(file_name)
 {
     set_title("Brick Breaker");
     set_child(main_box);
@@ -45,6 +47,9 @@ My_window::My_window(string file_name)
     set_infos();
     set_drawing();
     // TODO: set the game
+
+    if (!file_name.empty())
+        m_game->getLevel(file_name);
 }
 void My_window::set_commands()
 {
@@ -87,7 +92,12 @@ void My_window::save_clicked()
 }
 void My_window::restart_clicked()
 {
-    cout << __func__ << endl; // TODO: reset the game from the last read file
+    if (!last_file.empty())
+    {
+        m_game->getLevel(last_file);
+        update_infos();
+        drawing.queue_draw();
+    }
 }
 void My_window::start_clicked()
 {
@@ -261,7 +271,19 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     double side(min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
-    // TODO: draw the game
+    
+    //TODO
+    draw_arena();
+    cr->set_source_rgb(0.1, 0.1, 0.8);
+    draw_circle(m_game->get_paddle().getCircle());  
+
+    cr->set_source_rgb(0.8, 0.1, 0.1);
+    for (const auto& brick : m_game->get_bricks())
+        draw_square(brick->getSquare());           
+
+    cr->set_source_rgb(0.1, 0.8, 0.1);
+    for (const auto& ball : m_game->get_balls())
+        draw_circle(ball->getCircle());    
 }
 
 void My_window::set_mouse_controller()

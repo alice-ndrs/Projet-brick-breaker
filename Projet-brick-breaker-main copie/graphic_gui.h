@@ -5,5 +5,6 @@
 #include "graphic.h"
 
 void graphic_set_context(const Cairo::RefPtr<Cairo::Context> &cr);
+void set_color(double r, double g, double b);
 
 #endif
