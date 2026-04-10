@@ -55,8 +55,8 @@ bool square_intersects_circle(const Square& s, const Circle& c)
 // Dessine un cercle
 void draw_circle (const Circle& c)
 {
+    (*ptcr)->move_to(c.center.x, c.center.y);
     (*ptcr)->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
-    (*ptcr)->fill();
 }
 
 // Dessine un carré 

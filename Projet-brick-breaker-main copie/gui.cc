@@ -337,6 +337,8 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     
     set_color(BLACK);
     draw_circle(m_game->get_paddle().getCircle());
+    cr->set_line_width(1.0);
+    cr->stroke();
 
     for (const auto& brick : m_game->get_bricks()){
             switch (brick->getType())
@@ -367,7 +369,6 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
                 break;
             }  
             case BrickType::SPLIT:{
-                int size=brick->getC();
                 set_color(RED);
                 draw_square(brick->getSquare());
                 draw_split_square(brick->getSquare(), 0); 
@@ -376,7 +377,9 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
 
     set_color(BLACK);
     for (const auto& ball : m_game->get_balls())
-        draw_circle(ball->getCircle());    
+        draw_circle(ball->getCircle()); 
+        cr->fill(); 
+
     }
 }
 
@@ -405,5 +408,10 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    cout << __func__ << endl; // TODO
+    int w=drawing.get_width();//largeur widget
+    double newX = x * arena_size / w;
+    
+    m_game->get_paddle().setX(newX);//mise a jour de la position
+    drawing.queue_draw();
+    cout << __func__ << endl; // TODO : déplacer la raquette avec la souris
 }

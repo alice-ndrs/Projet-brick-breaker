@@ -13,6 +13,7 @@ class Paddle {
         double getX() const { return circle.center.x; }
         double getY() const { return circle.center.y; }
         double getR() const { return circle.r; }
+        void setX(double x) { circle.center.x = x; }
         const Circle& getCircle() const { return circle; }
         
     private:
