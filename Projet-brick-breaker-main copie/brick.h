@@ -38,6 +38,8 @@ class Brick
         virtual void hit () { remove = true; } //virtual permet de regarder 
         bool clear() const { return remove; }         // les points de vies
 
+        virtual int getHitPoints() const { return 1; };
+
     protected:
         BrickType t; // type de brick parmis les 3
         Square square;// position et taille
@@ -53,6 +55,7 @@ class Rainbow_brick : public Brick
         int check_specific() const override;
         void hit() override; //surcharge pour decrementer les vies 
                             // avant de la detruire
+        int getHitPoints() const override { return hit_points; }
     private : 
         int hit_points; // nbre de coups necessaires pour la casser
 };

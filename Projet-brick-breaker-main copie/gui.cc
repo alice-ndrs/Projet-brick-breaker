@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "graphic_gui.h"
 #include "gui.h"
+#include "Brick.h"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ enum Response
     OPEN_FILE,
     SAVE_FILE
 };
+
+
 enum Buttons
 {
     EXIT,
@@ -21,6 +24,7 @@ enum Buttons
     START,
     STEP
 };
+
 
 constexpr unsigned drawing_size(500);
 
@@ -51,6 +55,8 @@ My_window::My_window(string file_name)
     if (!file_name.empty())
         m_game->getLevel(file_name);
 }
+
+
 void My_window::set_commands()
 {
     for (auto &button : buttons)
@@ -74,22 +80,29 @@ void My_window::set_commands()
         sigc::mem_fun(*this, &My_window::step_clicked));
 }
 
+
 void My_window::exit_clicked()
 {
     hide();
 }
+
+
 void My_window::open_clicked()
 {
     auto dialog = new Gtk::FileChooserDialog("Choose a text file",
                                              Gtk::FileChooserDialog::Action::OPEN);
     set_dialog(dialog);
 }
+
+
 void My_window::save_clicked()
 {
     auto dialog = new Gtk::FileChooserDialog("Choose a text file",
                                              Gtk::FileChooserDialog::Action::SAVE);
     set_dialog(dialog);
 }
+
+
 void My_window::restart_clicked()
 {
     if (!last_file.empty())
@@ -99,6 +112,8 @@ void My_window::restart_clicked()
         drawing.queue_draw();
     }
 }
+
+
 void My_window::start_clicked()
 {
     cout << __func__ << endl;
@@ -126,10 +141,14 @@ void My_window::start_clicked()
         buttons[STEP].set_sensitive(false);
     }
 }
+
+
 void My_window::step_clicked()
 {
     cout << __func__ << endl; // TODO: make a single update
 }
+
+
 void My_window::set_key_controller()
 {
     auto contr = Gtk::EventControllerKey::create();
@@ -137,6 +156,8 @@ void My_window::set_key_controller()
                                         false);
     add_controller(contr);
 }
+
+
 bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state)
 {
     switch (keyval)
@@ -155,6 +176,7 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
     }
     return false;
 }
+
 
 void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 {
@@ -189,6 +211,8 @@ void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 
     dialog->show();
 }
+
+
 void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 {
     filesystem::path file_name = "";
@@ -224,6 +248,7 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
     }
 }
 
+
 bool My_window::loop()
 {
     if (loop_activated)
@@ -233,6 +258,7 @@ bool My_window::loop()
     }
     return false;
 }
+
 
 void My_window::set_infos()
 {
@@ -249,6 +275,7 @@ void My_window::set_infos()
     }
 }
 
+
 void My_window::update_infos()
 // TODO: update the different counters
 {
@@ -258,6 +285,7 @@ void My_window::update_infos()
     }
 }
 
+
 void My_window::set_drawing()
 {
     drawing.set_content_width(drawing_size);
@@ -265,6 +293,38 @@ void My_window::set_drawing()
     drawing.set_expand();
     drawing.set_draw_func(sigc::mem_fun(*this, &My_window::on_draw));
 }
+
+
+void draw_split_square(Square sq,int niveau){
+    
+    Color color[3]={ORANGE,YELLOW,GREEN};
+    if (niveau>2){return;}
+    if (sq.side<brick_size_min*2){return;}
+
+    double s=(sq.side-split_brick_gap)/2;
+    if (s<brick_size_min){return;}
+
+    double o=(split_brick_gap/2)+(s/2);
+    double cx=sq.center.x;
+    double cy=sq.center.y;
+
+    Square new_sq[4] = {
+        {{cx-o, cy-o}, s},
+        {{cx+o, cy-o}, s}, 
+        {{cx-o, cy+o}, s},
+        {{cx+o, cy+o}, s}
+    };
+
+    for (auto& sq_prime:new_sq)
+    {
+        set_color(color[niveau]);
+        draw_square(sq_prime);
+        draw_split_square(sq_prime, niveau+ 1);
+    }
+
+}
+
+
 void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     graphic_set_context(cr);
@@ -274,17 +334,52 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     
     //TODO
     draw_arena();
-    cr->set_source_rgb(0.1, 0.1, 0.8);
-    draw_circle(m_game->get_paddle().getCircle());  
+    
+    set_color(BLACK);
+    draw_circle(m_game->get_paddle().getCircle());
 
-    cr->set_source_rgb(0.8, 0.1, 0.1);
-    for (const auto& brick : m_game->get_bricks())
-        draw_square(brick->getSquare());           
+    for (const auto& brick : m_game->get_bricks()){
+            switch (brick->getType())
+            {
+            case BrickType::RAINBOW:
+            {
+                int hp = brick->getHitPoints();
+                if (hp==1) set_color(RED);
+                if (hp==2) set_color(ORANGE);
+                if (hp==3) set_color(YELLOW);
+                if (hp==4) set_color(GREEN);
+                if (hp==5) set_color(CYAN);
+                if (hp==6) set_color(BLUE);
+                if (hp==7) set_color(PURPLE); 
+                draw_square(brick->getSquare());   
+                break;
+            }
+            case BrickType::BALL:
+            {
+                set_color(RED);
+                draw_square(brick->getSquare());
+                
+                set_color(BLACK);
+                Circle c;
+                c.center = brick->getSquare().center;
+                c.r = new_ball_radius;
+                draw_circle(c);
+                break;
+            }  
+            case BrickType::SPLIT:{
+                int size=brick->getC();
+                set_color(RED);
+                draw_square(brick->getSquare());
+                draw_split_square(brick->getSquare(), 0); 
+            }
+    }         
 
-    cr->set_source_rgb(0.1, 0.8, 0.1);
+    set_color(BLACK);
     for (const auto& ball : m_game->get_balls())
         draw_circle(ball->getCircle());    
+    }
 }
+
 
 void My_window::set_mouse_controller()
 {
@@ -300,10 +395,14 @@ void My_window::set_mouse_controller()
     drawing.add_controller(left_click);
     drawing.add_controller(move);
 }
+
+
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
     cout << __func__ << endl; // TODO
 }
+
+
 void My_window::on_drawing_move(double x, double y)
 {
     cout << __func__ << endl; // TODO
