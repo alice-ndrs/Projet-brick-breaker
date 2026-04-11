@@ -70,7 +70,7 @@ void draw_square (const Square& s)
 // Dessine l'arène 
 void draw_arena ()
 {
-    (*ptcr)->set_source_rgb(0.0, 0.0, 0.0);
+    set_color(GREY);
     (*ptcr)->set_line_width(0.2);
     (*ptcr)->rectangle(0, 0, arena_size, arena_size);
     (*ptcr)->stroke();

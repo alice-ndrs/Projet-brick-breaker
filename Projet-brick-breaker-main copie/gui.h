@@ -13,6 +13,8 @@ public:
     using Gtk::Window::Window;
     My_window(std::string file_name);
 
+    double init_x=0;
+
 private:
     Game* m_game = nullptr;
     std::string last_file;

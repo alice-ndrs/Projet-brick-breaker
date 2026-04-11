@@ -57,6 +57,8 @@ class Game
         const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
         const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
         Paddle& get_paddle() { return paddle; }
+        int get_score() {return score;}
+        int get_lives() {return lives;}
     private:
         int lives;
         int score;
