@@ -108,6 +108,37 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
     return false;
 }
 
+
+bool Game::saveLevel(const string& filename){// verifier si ca fonctionne !!!!
+    ofstream file(filename);
+    if (!file.fail()) 
+    {
+        file<<score<<endl;
+        file<<lives<<endl;
+        file<<paddle.getX()<<" "<<paddle.getY()<<" "<<paddle.getR()<<endl;
+
+        file<<bricks.size()<<endl;
+
+        for(size_t i = 0; i < bricks.size(); ++i){
+            file<<static_cast<int>(bricks[i]->getType())<<" "<<bricks[i]->getX()<<" "<<bricks[i]->getY();
+            file<<" "<<bricks[i]->getC();
+            if(bricks[i]->getType()==BrickType::RAINBOW){
+                file <<" "<<bricks[i]->getHitPoints();
+            }
+            file<<endl;
+        }
+
+        file<< balls.size()<<endl;
+        for(size_t i = 0; i < balls.size(); ++i){
+            file<<balls[i]->getX()<<" "<<balls[i]->getY()<<" "<<balls[i]->getR();
+            file<<" "<<balls[i]->getDx()<<" "<<balls[i]->getDy();
+            file<<endl;
+        }
+        return true;
+    }
+
+}
+
 //------------- Fonctions de Décodage Spécifiques -------------
 
 bool Game::decodage_score(istringstream& data) 

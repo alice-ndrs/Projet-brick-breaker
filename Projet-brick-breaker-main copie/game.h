@@ -29,6 +29,7 @@ class Game
 
         bool getLevel (const std::string& filename); // déclaration de la 
                                                         //fin de lecture de fichier
+        bool saveLevel (const std:: string& filename);
         // --- Gestion des collisions ---
         int check_Collisions () const;              
         bool collision_bricks() const;

@@ -25,6 +25,8 @@ class Ball
         double getX() const { return circle.center.x; }
         double getY() const { return circle.center.y; }
         double getR() const { return circle.r; }
+        double getDx()const { return dx; }
+        double getDy()const { return dy; }
         const Circle& getCircle() const { return circle; }
 
         void reset(const Paddle& p);  // repositionnement de la ball si lives>0

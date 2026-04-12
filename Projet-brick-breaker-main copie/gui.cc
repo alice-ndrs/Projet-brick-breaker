@@ -145,6 +145,9 @@ void My_window::start_clicked()
 
 void My_window::step_clicked()
 {
+    //m_game->update();// movement clic par clic de la ball
+    update_infos();
+    drawing.queue_draw();
     cout << __func__ << endl; // TODO: make a single update
 }
 
@@ -163,13 +166,13 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
     switch (keyval)
     {
     case '1':
-        // TODO: make a single update
+        step_clicked();
         return true;
     case 's':
-        // TODO: pause or unpause the game
+        start_clicked();
         return true;
     case 'r':
-        // TODO: reset the game from the last read file
+        restart_clicked();
         return true;
     default:
         break;
@@ -233,6 +236,9 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         if (file_name != "")
         {
             cout << "open file " << file_name << endl; // TODO: set game from a file
+            m_game->getLevel(file_name.string());
+            update_infos();
+            drawing.queue_draw();
             dialog->hide();
         }
         break;
@@ -240,6 +246,7 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         if (file_name != "")
         {
             cout << "save file " << file_name << endl; // TODO: save the game
+            m_game->saveLevel(file_name.string());
             dialog->hide();
         }
         break;
@@ -285,10 +292,10 @@ void My_window::update_infos()
     {
         value.set_text("0");
     }
-    info_value[0].set_text(string(m_game->get_score()));
-    info_value[1].set_text(string(m_game->get_lives()));
-    info_value[2].set_text(string(m_game->get_bricks().size()));
-    info_value[3].set_text(string(m_game->get_balls().size()));
+    info_value[0].set_text(to_string(m_game->get_score()));
+    info_value[1].set_text(to_string(m_game->get_lives()));
+    info_value[2].set_text(to_string(m_game->get_bricks().size()));
+    info_value[3].set_text(to_string(m_game->get_balls().size()));
 }
 
 
