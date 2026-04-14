@@ -109,7 +109,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
 }
 
 
-bool Game::saveLevel(const string& filename){// verifier si ca fonctionne !!!!
+bool Game::saveLevel(const string& filename){
     ofstream file(filename);
     if (!file.fail()) 
     {
@@ -136,6 +136,7 @@ bool Game::saveLevel(const string& filename){// verifier si ca fonctionne !!!!
         }
         return true;
     }
+    return false;
 
 }
 
