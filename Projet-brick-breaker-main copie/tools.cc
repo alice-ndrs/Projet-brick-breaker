@@ -1,5 +1,4 @@
 #include "tools.h"
-#include "graphic_gui.h"
 #include <cmath>
 #include <algorithm>
 #include "Constants.h"
@@ -50,28 +49,4 @@ bool circle_intersects_square(const Circle& c, const Square& s)
 bool square_intersects_circle(const Square& s, const Circle& c)
 {
     return circle_intersects_square(c, s);
-}
-
-// Dessine un cercle
-void draw_circle (const Circle& c)
-{
-    (*ptcr)->move_to(c.center.x, c.center.y);
-    (*ptcr)->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
-}
-
-// Dessine un carré 
-void draw_square (const Square& s)
-{
-    double half = s.side / 2.0;
-    (*ptcr)->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
-    (*ptcr)->fill();
-}
-
-// Dessine l'arène 
-void draw_arena ()
-{
-    set_color(GREY);
-    (*ptcr)->set_line_width(0.2);
-    (*ptcr)->rectangle(0, 0, arena_size, arena_size);
-    (*ptcr)->stroke();
 }

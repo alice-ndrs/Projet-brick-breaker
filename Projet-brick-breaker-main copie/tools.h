@@ -1,7 +1,7 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 #include <cairomm/context.h>
-#include "graphic.h"
+
 constexpr double epsil_zero = 0.125;
 
 struct Point {
@@ -25,9 +25,5 @@ bool square_intersects_square(const Square& s1, const Square& s2);
 bool circle_intersects_square(const Circle& c, const Square& s);
 bool square_intersects_circle(const Square& s, const Circle& c);
 
-void set_color(Color color);
-void draw_circle(const Circle& c);
-void draw_square(const Square& s);
-void draw_arena();
 
 #endif
