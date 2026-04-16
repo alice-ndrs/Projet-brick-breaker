@@ -1,0 +1,87 @@
+#include <iostream>
+#include "Brick.h"
+#include "Message.h"
+#include "Paddle.h"
+using namespace std;
+
+
+//------------- Constructeur Brick et des sous-classes -------------
+
+Brick::Brick(BrickType t, double x, double y, double c) :
+    t(t), square{{x,y}, c}, remove(false)
+{}
+
+Ball_brick::Ball_brick(double x, double y, double c)
+    : Brick(BrickType::BALL, x, y, c), new_ball_radius(::new_ball_radius)
+{}
+
+Split_brick::Split_brick(double x, double y, double c)
+    : Brick(BrickType::SPLIT, x, y, c), split_brick_gap(::split_brick_gap)
+{}
+
+Rainbow_brick::Rainbow_brick(double x, double y, double c, int h)
+    : Brick(BrickType::RAINBOW, x, y, c), hit_points(h)
+{}
+
+//------------- Fonctions de test pour la classe Brick -------------
+
+int Brick::check_Brick() const
+{ 
+    int type_value = static_cast<int>(t); 
+    if (type_value < 0 || type_value > 2) { // verifie le type
+        cout << message::invalid_brick_type(type_value);
+        return 1;
+    }
+    
+    bool outside_x = (square.center.x - square.side/2 < 0) 
+                    || (square.center.x + square.side/2 > arena_size);
+
+    bool outside_y = (square.center.y - square.side/2 < 0) 
+                    || (square.center.y + square.side/2 > arena_size);
+
+    if (outside_x || outside_y) { //verifie si Ball est dans l'arene
+        cout << message::brick_outside(square.center.x, square.center.y);
+        return 1;
+    }
+
+    if (square.side<brick_size_min) { //verifie la taille de la Brick
+        cout << message::invalid_brick_size(square.side);
+        return 1;
+    }
+
+    return check_specific();
+}
+
+
+int Rainbow_brick::check_specific() const 
+{
+    if (hit_points<1 || hit_points>7) {//verifie les hits point (Rainbow_brick) 
+        cout << message::invalid_hit_points(hit_points);
+        return 1;
+    }
+    return 0;
+}
+
+// -------- Détection de collisions --------
+
+bool Brick::collision_brick (const Brick& other) const //superposition 2 Brick
+{
+    return square_intersects_square(square, other.square);
+}
+
+
+bool Brick::collision_paddle (const Paddle& p) const //superposition Brick
+{                                                   // et Paddle 
+    return square_intersects_circle(square, p.getCircle());
+}
+
+
+void Rainbow_brick::hit() {
+    if (hit_points > 0) {// on decremente si la Brick a encore des hits points
+        --hit_points;
+    }
+
+    if (hit_points <= 0) {//sinon on enleve la Brick
+        remove = true; 
+    }
+}
