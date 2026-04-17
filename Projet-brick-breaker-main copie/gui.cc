@@ -466,7 +466,7 @@ void My_window::on_drawing_move(double x, double y)
     double old_x=m_game->get_paddle().getX();
     m_game->get_paddle().setX(new_x);//mise a jour de la position
 
-    if (m_game->get_paddle().check_Paddle())
+    if (m_game->get_paddle().check_Paddle(false))
     {
         m_game->get_paddle().setX(old_x);
         new_x = old_x;

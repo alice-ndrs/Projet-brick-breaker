@@ -13,20 +13,24 @@ circle{{x,y}, r}
 
 //------------- Fonction de test pour la classe Paddle -------------
 
-int Paddle::check_Paddle() const
+int Paddle::check_Paddle(bool print_error) const
 {
     // Les intersections avec l’axe x doivent exister
     double dx_squared = circle.r * circle.r - 
                         circle.center.y * circle.center.y; 
                         
     if (circle.center.y > 0 || dx_squared < 0) {
-        cout << message::paddle_outside(circle.center.x, circle.center.y);
+        if(print_error){
+            cout << message::paddle_outside(circle.center.x, circle.center.y);
+        }
         return 1;
     }
     
     // Une partie du cercle doit être visible
     if (circle.center.y + circle.r <= 0) { 
-        cout << message::paddle_outside(circle.center.x, circle.center.y);
+        if(print_error){
+            cout << message::paddle_outside(circle.center.x, circle.center.y);
+        };
         return 1;
     }
 
@@ -35,7 +39,9 @@ int Paddle::check_Paddle() const
     double right = circle.center.x + dx;
 
     if (left < 0 || right > arena_size) {
-        cout << message::paddle_outside(circle.center.x, circle.center.y);
+        if(print_error){
+            cout << message::paddle_outside(circle.center.x, circle.center.y);
+        }
         return 1;
     }
 
