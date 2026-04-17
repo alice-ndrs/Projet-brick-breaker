@@ -95,12 +95,21 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
             istringstream data(line);
 
             if (decodage_ligne(data) == false)
+            {
+                reset();
                 return false;
+            }
         }
 
-        if (etat != FIN) return false;
+        if (etat != FIN) {
+            reset();
+            return false;
+        }
 
-        if (check_Collisions()) return false;
+        if (check_Collisions()) {
+            reset();
+            return false;
+        }
 
         cout<<message::success();
         return true;

@@ -53,7 +53,24 @@ My_window::My_window(string file_name)
     // TODO: set the game
 
     if (!file_name.empty())
-        m_game->getLevel(file_name);
+    {
+        //m_game->getLevel(file_name);
+
+        if (m_game->getLevel(file_name))
+        {
+            update_infos();
+            drawing.queue_draw();
+            level_loaded = true;
+        }
+        else
+        {
+            m_game->reset();
+            level_loaded = false;
+            update_infos();
+            drawing.queue_draw();
+        }
+    }
+        
 }
 
 
@@ -107,7 +124,13 @@ void My_window::restart_clicked()
 {
     if (!last_file.empty())
     {
-        m_game->getLevel(last_file);
+        if (m_game->getLevel(last_file))
+            level_loaded = true;
+        else
+        {
+            m_game->reset();
+            level_loaded = false;
+        }
         update_infos();
         drawing.queue_draw();
     }
@@ -236,7 +259,13 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         if (file_name != "")
         {
             cout << "open file " << file_name << endl; // TODO: set game from a file
-            m_game->getLevel(file_name.string());
+            if (m_game->getLevel(file_name.string()))
+                level_loaded = true;
+            else
+            {
+                m_game->reset();
+                level_loaded = false;
+            }
             update_infos();
             drawing.queue_draw();
             dialog->hide();
@@ -348,10 +377,12 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     //TODO
     draw_arena();
     
-    set_color(BLACK);
-    draw_circle(m_game->get_paddle().getCircle());
-    cr->set_line_width(1.0);
-    cr->stroke();
+    if (level_loaded) {
+        set_color(BLACK);
+        draw_circle(m_game->get_paddle().getCircle());
+        cr->set_line_width(1.0);
+        cr->stroke();
+    }
 
     for (const auto& brick : m_game->get_bricks()){
             switch (brick->getType())

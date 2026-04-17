@@ -18,6 +18,7 @@ public:
 private:
     Game* m_game = nullptr;
     std::string last_file;
+    bool level_loaded = false;
 
     Gtk::Box main_box, panel_box, command_box;
     Gtk::Grid info_grid;
