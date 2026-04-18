@@ -58,7 +58,6 @@ My_window::My_window(string file_name)
         //m_game->getLevel(file_name);
         if (m_game->getLevel(file_name))
         {
-            update_infos();
             drawing.queue_draw();
             level_loaded = true;
         }
@@ -66,7 +65,6 @@ My_window::My_window(string file_name)
         {
             m_game->reset();
             level_loaded = false;
-            update_infos();
             drawing.queue_draw();
         }
     }
