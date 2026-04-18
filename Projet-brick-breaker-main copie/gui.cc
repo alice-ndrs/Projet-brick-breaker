@@ -53,18 +53,34 @@ My_window::My_window(string file_name)
     // TODO: set the game
 
     update_infos();
+
+    buttons[SAVE].set_sensitive(false);
+    buttons[START].set_sensitive(false);
+    buttons[STEP].set_sensitive(false);
+
     if (!file_name.empty())
     {
         //m_game->getLevel(file_name);
         if (m_game->getLevel(file_name))
         {
-            drawing.queue_draw();
             level_loaded = true;
+            init_x = m_game->get_paddle().getX();
+
+            buttons[SAVE].set_sensitive(true);
+            buttons[START].set_sensitive(true);
+            buttons[STEP].set_sensitive(true);
+
+            drawing.queue_draw();
         }
         else
         {
             m_game->reset();
             level_loaded = false;
+
+            buttons[SAVE].set_sensitive(false);
+            buttons[START].set_sensitive(false);
+            buttons[STEP].set_sensitive(false);
+
             drawing.queue_draw();
         }
     }
@@ -123,11 +139,22 @@ void My_window::restart_clicked()
     if (!last_file.empty())
     {
         if (m_game->getLevel(last_file))
+        {
             level_loaded = true;
+            init_x = m_game->get_paddle().getX();
+
+            buttons[SAVE].set_sensitive(true);
+            buttons[START].set_sensitive(true);
+            buttons[STEP].set_sensitive(true);
+        }
         else
         {
             m_game->reset();
             level_loaded = false;
+
+            buttons[SAVE].set_sensitive(false);
+            buttons[START].set_sensitive(false);
+            buttons[STEP].set_sensitive(false);
         }
         update_infos();
         drawing.queue_draw();
@@ -166,9 +193,56 @@ void My_window::start_clicked()
 
 void My_window::step_clicked()
 {
-    //m_game->update();// movement clic par clic de la ball
-    update_infos();
+    if (!level_loaded) return; // Si aucun niveau valide n'est chargé, on ne fait rien
+
+    double old_x = m_game->get_paddle().getX(); // Position actuelle de la raquette
+
+    double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la position actuelle
+
+    double new_x = old_x; // Par défaut, on garde l'ancienne position
+
+    
+    if (abs(diff) <= delta_norm_max) // Si la cible est proche, on peut aller directement dessus
+    {
+        new_x = init_x;
+    }
+    else
+    {
+        // Sinon, on avance seulement d'un "pas" de taille delta_norm_max
+        if (diff > 0)
+            new_x = old_x + delta_norm_max;   // vers la droite
+        else
+            new_x = old_x - delta_norm_max;   // vers la gauche
+    }
+
+    // On applique temporairement cette nouvelle position
+    m_game->get_paddle().setX(new_x);
+
+    // Si la nouvelle position sort de la zone autorisée, on annule
+    if (m_game->get_paddle().check_Paddle(false))
+    {
+        m_game->get_paddle().setX(old_x);
+    }
+    else
+    {
+        // Sinon, on vérifie si la raquette touche une brique
+        // Si oui, on annule aussi le déplacement
+        for (const auto& brick : m_game->get_bricks())
+        {
+            if (circle_intersects_square(m_game->get_paddle().getCircle(),
+                                         brick->getSquare()))
+            {
+                m_game->get_paddle().setX(old_x);
+                break;
+            }
+        }
+    }
+
+    update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
+
+    //m_game->update();// movement clic par clic de la ball
+
     cout << __func__ << endl; // TODO: make a single update
 }
 
@@ -258,11 +332,23 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         {
             cout << "open file " << file_name << endl; // TODO: set game from a file
             if (m_game->getLevel(file_name.string()))
+            {
                 level_loaded = true;
+                last_file = file_name.string();
+                init_x = m_game->get_paddle().getX();
+
+                buttons[SAVE].set_sensitive(true);
+                buttons[START].set_sensitive(true);
+                buttons[STEP].set_sensitive(true);
+            }
             else
             {
                 m_game->reset();
                 level_loaded = false;
+
+                buttons[SAVE].set_sensitive(false);
+                buttons[START].set_sensitive(false);
+                buttons[STEP].set_sensitive(false);
             }
             update_infos();
             drawing.queue_draw();
@@ -288,9 +374,11 @@ bool My_window::loop()
     if (loop_activated)
     {
         // TODO: update the game and the interface
-        update_infos();
-        drawing.queue_draw();
+        step_clicked();
         return true;
+        // update_infos();
+        // drawing.queue_draw();
+        // return true;
     }
     return false;
 }
@@ -450,40 +538,45 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    int w=drawing.get_width();//largeur widget
-    double new_x = x * arena_size / w;
+    int w = drawing.get_width(); //si la souris bouge, on maj la cible init_x, 
+    //mais on ne bouge pas encore la raquette !!
+    init_x = x * arena_size / w;
+
+    // ----- ancien on_drawing_move -----
+    // int w=drawing.get_width();//largeur widget
+    // double new_x = x * arena_size / w;
     
-    double vx =new_x-init_x;
+    // double vx =new_x-init_x;
 
-    if (abs(vx)>delta_norm_max){ 
-        double delta = delta_norm_max;
-        if(vx <= 0) { delta=-delta_norm_max;}
-        new_x=init_x+delta;
-    }
+    // if (abs(vx)>delta_norm_max){ 
+    //     double delta = delta_norm_max;
+    //     if(vx <= 0) { delta=-delta_norm_max;}
+    //     new_x=init_x+delta;
+    // }
 
-    double old_x=m_game->get_paddle().getX();
-    m_game->get_paddle().setX(new_x);//mise a jour de la position
+    // double old_x=m_game->get_paddle().getX();
+    // m_game->get_paddle().setX(new_x);//mise a jour de la position
 
-    if (m_game->get_paddle().check_Paddle(false))
-    {
-        m_game->get_paddle().setX(old_x);
-        new_x = old_x;
-    }
-    else
-    {
-        for (const auto& brick : m_game->get_bricks())
-        {
-            if (circle_intersects_square(m_game->get_paddle().getCircle(),
-                                brick->getSquare()))
-            {
-                m_game->get_paddle().setX(old_x);
-                new_x = old_x;
-                break;
-            }
-        }
-    }
+    // if (m_game->get_paddle().check_Paddle(false))
+    // {
+    //     m_game->get_paddle().setX(old_x);
+    //     new_x = old_x;
+    // }
+    // else
+    // {
+    //     for (const auto& brick : m_game->get_bricks())
+    //     {
+    //         if (circle_intersects_square(m_game->get_paddle().getCircle(),
+    //                             brick->getSquare()))
+    //         {
+    //             m_game->get_paddle().setX(old_x);
+    //             new_x = old_x;
+    //             break;
+    //         }
+    //     }
+    // }
 
-    init_x=new_x;
-    drawing.queue_draw();
-    cout << __func__ << endl; // TODO : déplacer la raquette avec la souris
+    // init_x=new_x;
+    // drawing.queue_draw();
+    // cout << __func__ << endl; // TODO : déplacer la raquette avec la souris
 }

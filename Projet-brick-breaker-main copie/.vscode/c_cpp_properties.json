@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}",
+                "/opt/homebrew/include",
+                "/opt/homebrew/include/gtkmm-4.0",
+                "/opt/homebrew/lib/gtkmm-4.0/include",
+                "/opt/homebrew/include/gtk-4.0",
+                "/opt/homebrew/include/glib-2.0",
+                "/opt/homebrew/lib/glib-2.0/include",
+                "/opt/homebrew/include/sigc++-3.0",
+                "/opt/homebrew/lib/sigc++-3.0/include",
+                "/opt/homebrew/include/cairomm-1.16",
+                "/opt/homebrew/lib/cairomm-1.16/include",
+                "/opt/homebrew/include/cairo",
+                "/opt/homebrew/include/pixman-1",
+                "/opt/homebrew/include/glibmm-2.68",
+                "/opt/homebrew/lib/glibmm-2.68/include",
+                "/opt/homebrew/include/giomm-2.68",
+                "/opt/homebrew/lib/giomm-2.68/include",
+                "/opt/homebrew/include/freetype2",
+                "/opt/homebrew/include/harfbuzz",
+                "/opt/homebrew/include/fontconfig",
+                "/opt/homebrew/include/pango-1.0",
+                "/opt/homebrew/include/pangomm-2.48",
+                "/opt/homebrew/lib/pangomm-2.48/include",
+                "/opt/homebrew/include/gdk-pixbuf-2.0",
+                "/opt/homebrew/include/graphene-1.0",
+                "/opt/homebrew/lib/graphene-1.0/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
