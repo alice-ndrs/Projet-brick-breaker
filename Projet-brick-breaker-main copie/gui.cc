@@ -52,10 +52,10 @@ My_window::My_window(string file_name)
     set_drawing();
     // TODO: set the game
 
+    update_infos();
     if (!file_name.empty())
     {
         //m_game->getLevel(file_name);
-
         if (m_game->getLevel(file_name))
         {
             update_infos();
