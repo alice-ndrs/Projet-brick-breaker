@@ -462,30 +462,34 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     
     //TODO
     draw_arena();
-    
-    if (level_loaded) {
-        set_color(BLACK);
-        draw_circle(m_game->get_paddle().getCircle());
-        cr->set_line_width(1.0);
-        cr->stroke();
-    }
 
-    for (const auto& brick : m_game->get_bricks()){
-            switch (brick->getType())
-            {
+    if (!level_loaded) return;
+    
+    
+    set_color(BLACK);
+    draw_arc(m_game->get_paddle().getCircle());
+    cr->set_line_width(1.0);
+    cr->stroke();
+    
+    // on dessine les briques
+    for (const auto& brick : m_game->get_bricks())
+    {
+        switch (brick->getType()) 
+        {
             case BrickType::RAINBOW:
             {
                 int hp = brick->getHitPoints();
                 if (hp==1) set_color(RED);
-                if (hp==2) set_color(ORANGE);
-                if (hp==3) set_color(YELLOW);
-                if (hp==4) set_color(GREEN);
-                if (hp==5) set_color(CYAN);
-                if (hp==6) set_color(BLUE);
-                if (hp==7) set_color(PURPLE); 
+                else if (hp==2) set_color(ORANGE);
+                else if (hp==3) set_color(YELLOW);
+                else if (hp==4) set_color(GREEN);
+                else if (hp==5) set_color(CYAN);
+                else if (hp==6) set_color(BLUE);
+                else if (hp==7) set_color(PURPLE); 
                 draw_square(brick->getSquare());   
                 break;
             }
+
             case BrickType::BALL:
             {
                 set_color(RED);
@@ -496,20 +500,24 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
                 c.center=brick->getSquare().center;
                 c.r=new_ball_radius;
                 draw_circle(c);
+                cr->fill();
                 break;
-            }  
-            case BrickType::SPLIT:{
+            }
+
+            case BrickType::SPLIT:
+            {
                 set_color(RED);
                 draw_square(brick->getSquare());
                 draw_split_square(brick->getSquare(), 0); 
             }
-    }         
+        }         
+    }
 
     set_color(BLACK);
     for (const auto& ball : m_game->get_balls())
+    {
         draw_circle(ball->getCircle()); 
         cr->fill(); 
-
     }
 }
 

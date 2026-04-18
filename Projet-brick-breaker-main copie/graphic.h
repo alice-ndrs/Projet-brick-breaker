@@ -20,6 +20,7 @@ enum Color
 void set_color(Color color);
 void draw_circle(const Circle& c);
 void draw_square(const Square& s);
+void draw_arc(const Circle& c);
 void draw_arena();
 
 #endif

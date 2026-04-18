@@ -2,6 +2,7 @@
 #include "tools.h"
 #include "Constants.h"
 #include "graphic_gui.h"
+#include <cmath>
 #include <cairomm/context.h>
 
 using namespace std;
@@ -73,6 +74,21 @@ void draw_square (const Square& s)
     double half = s.side / 2.0;
     (*ptcr)->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
     (*ptcr)->fill();
+}
+
+// Dessine un arc
+void draw_arc(const Circle& c)
+{
+    double dx_squared = c.r * c.r - c.center.y * c.center.y;
+
+    if (dx_squared < 0) return;
+
+    double dx = sqrt(dx_squared);
+
+    double angle1 = atan2(-c.center.y, -dx);
+    double angle2 = atan2(-c.center.y,  dx);
+
+    (*ptcr)->arc(c.center.x, c.center.y, c.r, angle1, angle2);
 }
 
 // Dessine l'arène 
