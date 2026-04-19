@@ -88,7 +88,7 @@ void draw_arc(const Circle& c)
     double angle1 = atan2(-c.center.y, -dx);
     double angle2 = atan2(-c.center.y,  dx);
 
-    (*ptcr)->arc(c.center.x, c.center.y, c.r, angle1, angle2);
+    (*ptcr)->arc_negative(c.center.x, c.center.y, c.r, angle1, angle2);
 }
 
 // Dessine l'arène 

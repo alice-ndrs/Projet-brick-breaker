@@ -16,7 +16,7 @@ public:
     double init_x=0;
 
 private:
-    Game* m_game = nullptr;
+    Game m_game;
     std::string last_file;
     bool level_loaded = false;
 

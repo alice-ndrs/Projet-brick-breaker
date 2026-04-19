@@ -29,14 +29,14 @@ enum Buttons
 constexpr unsigned drawing_size(500);
 
 My_window::My_window(string file_name)
-    : main_box(Gtk::Orientation::HORIZONTAL), panel_box(Gtk::Orientation::VERTICAL),
+    : m_game(), last_file(file_name), main_box(Gtk::Orientation::HORIZONTAL), panel_box(Gtk::Orientation::VERTICAL),
       command_box(Gtk::Orientation::VERTICAL), loop_activated(false),
       buttons({Gtk::Button("exit"), Gtk::Button("open"), Gtk::Button("save"),
                Gtk::Button("restart"), Gtk::Button("start"), Gtk::Button("step")}),
-      info_frame("Infos :"), 
+      info_frame("Infos :"),
       info_text({Gtk::Label("score:"), Gtk::Label("lives:"),
-                                        Gtk::Label("bricks:"), Gtk::Label("balls:")}),
-    m_game(new Game()), last_file(file_name)
+                                        Gtk::Label("bricks:"), Gtk::Label("balls:")})
+      
 {
     set_title("Brick Breaker");
     set_child(main_box);
@@ -60,11 +60,11 @@ My_window::My_window(string file_name)
 
     if (!file_name.empty())
     {
-        //m_game->getLevel(file_name);
-        if (m_game->getLevel(file_name))
+        //m_game.getLevel(file_name);
+        if (m_game.getLevel(file_name))
         {
             level_loaded = true;
-            init_x = m_game->get_paddle().getX();
+            init_x = m_game.get_paddle().getX();
 
             buttons[SAVE].set_sensitive(true);
             buttons[START].set_sensitive(true);
@@ -74,7 +74,7 @@ My_window::My_window(string file_name)
         }
         else
         {
-            m_game->reset();
+            m_game.reset();
             level_loaded = false;
 
             buttons[SAVE].set_sensitive(false);
@@ -138,10 +138,10 @@ void My_window::restart_clicked()
 {
     if (!last_file.empty())
     {
-        if (m_game->getLevel(last_file))
+        if (m_game.getLevel(last_file))
         {
             level_loaded = true;
-            init_x = m_game->get_paddle().getX();
+            init_x = m_game.get_paddle().getX();
 
             buttons[SAVE].set_sensitive(true);
             buttons[START].set_sensitive(true);
@@ -149,7 +149,7 @@ void My_window::restart_clicked()
         }
         else
         {
-            m_game->reset();
+            m_game.reset();
             level_loaded = false;
 
             buttons[SAVE].set_sensitive(false);
@@ -195,7 +195,7 @@ void My_window::step_clicked()
 {
     if (!level_loaded) return; // Si aucun niveau valide n'est chargé, on ne fait rien
 
-    double old_x = m_game->get_paddle().getX(); // Position actuelle de la raquette
+    double old_x = m_game.get_paddle().getX(); // Position actuelle de la raquette
 
     double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la position actuelle
 
@@ -216,23 +216,23 @@ void My_window::step_clicked()
     }
 
     // On applique temporairement cette nouvelle position
-    m_game->get_paddle().setX(new_x);
+    m_game.get_paddle().setX(new_x);
 
     // Si la nouvelle position sort de la zone autorisée, on annule
-    if (m_game->get_paddle().check_Paddle(false))
+    if (m_game.get_paddle().check_Paddle(false))
     {
-        m_game->get_paddle().setX(old_x);
+        m_game.get_paddle().setX(old_x);
     }
     else
     {
         // Sinon, on vérifie si la raquette touche une brique
         // Si oui, on annule aussi le déplacement
-        for (const auto& brick : m_game->get_bricks())
+        for (const auto& brick : m_game.get_bricks())
         {
-            if (circle_intersects_square(m_game->get_paddle().getCircle(),
+            if (circle_intersects_square(m_game.get_paddle().getCircle(),
                                          brick->getSquare()))
             {
-                m_game->get_paddle().setX(old_x);
+                m_game.get_paddle().setX(old_x);
                 break;
             }
         }
@@ -241,7 +241,7 @@ void My_window::step_clicked()
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
 
-    //m_game->update();// movement clic par clic de la ball
+    //m_game.update();// movement clic par clic de la ball
 
     cout << __func__ << endl; // TODO: make a single update
 }
@@ -331,19 +331,18 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         if (file_name != "")
         {
             cout << "open file " << file_name << endl; // TODO: set game from a file
-            if (m_game->getLevel(file_name.string()))
+            if (m_game.getLevel(file_name.string()))
             {
                 level_loaded = true;
                 last_file = file_name.string();
-                init_x = m_game->get_paddle().getX();
-
+                init_x = m_game.get_paddle().getX();
                 buttons[SAVE].set_sensitive(true);
                 buttons[START].set_sensitive(true);
                 buttons[STEP].set_sensitive(true);
             }
             else
             {
-                m_game->reset();
+                m_game.reset();
                 level_loaded = false;
 
                 buttons[SAVE].set_sensitive(false);
@@ -359,7 +358,7 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
         if (file_name != "")
         {
             cout << "save file " << file_name << endl; // TODO: save the game
-            m_game->saveLevel(file_name.string());
+            m_game.saveLevel(file_name.string());
             dialog->hide();
         }
         break;
@@ -407,10 +406,10 @@ void My_window::update_infos()
     {
         value.set_text("0");
     }
-    info_value[0].set_text(to_string(m_game->get_score()));
-    info_value[1].set_text(to_string(m_game->get_lives()));
-    info_value[2].set_text(to_string(m_game->get_bricks().size()));
-    info_value[3].set_text(to_string(m_game->get_balls().size()));
+    info_value[0].set_text(to_string(m_game.get_score()));
+    info_value[1].set_text(to_string(m_game.get_lives()));
+    info_value[2].set_text(to_string(m_game.get_bricks().size()));
+    info_value[3].set_text(to_string(m_game.get_balls().size()));
 }
 
 
@@ -467,12 +466,12 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     
     
     set_color(BLACK);
-    draw_arc(m_game->get_paddle().getCircle());
+    draw_arc(m_game.get_paddle().getCircle());
     cr->set_line_width(1.0);
     cr->stroke();
     
     // on dessine les briques
-    for (const auto& brick : m_game->get_bricks())
+    for (const auto& brick : m_game.get_bricks())
     {
         switch (brick->getType()) 
         {
@@ -514,7 +513,7 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     }
 
     set_color(BLACK);
-    for (const auto& ball : m_game->get_balls())
+    for (const auto& ball : m_game.get_balls())
     {
         draw_circle(ball->getCircle()); 
         cr->fill(); 
@@ -562,22 +561,22 @@ void My_window::on_drawing_move(double x, double y)
     //     new_x=init_x+delta;
     // }
 
-    // double old_x=m_game->get_paddle().getX();
-    // m_game->get_paddle().setX(new_x);//mise a jour de la position
+    // double old_x=m_game.get_paddle().getX();
+    // m_game.get_paddle().setX(new_x);//mise a jour de la position
 
-    // if (m_game->get_paddle().check_Paddle(false))
+    // if (m_game.get_paddle().check_Paddle(false))
     // {
-    //     m_game->get_paddle().setX(old_x);
+    //     m_game.get_paddle().setX(old_x);
     //     new_x = old_x;
     // }
     // else
     // {
-    //     for (const auto& brick : m_game->get_bricks())
+    //     for (const auto& brick : m_game.get_bricks())
     //     {
-    //         if (circle_intersects_square(m_game->get_paddle().getCircle(),
+    //         if (circle_intersects_square(m_game.get_paddle().getCircle(),
     //                             brick->getSquare()))
     //         {
-    //             m_game->get_paddle().setX(old_x);
+    //             m_game.get_paddle().setX(old_x);
     //             new_x = old_x;
     //             break;
     //         }
