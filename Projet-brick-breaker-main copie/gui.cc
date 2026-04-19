@@ -164,7 +164,7 @@ void My_window::restart_clicked()
 
 void My_window::start_clicked()
 {
-    cout << __func__ << endl;
+    // cout << __func__ << endl;
     if (loop_activated)
     {
         loop_conn.disconnect();
@@ -243,7 +243,7 @@ void My_window::step_clicked()
 
     //m_game.update();// movement clic par clic de la ball
 
-    cout << __func__ << endl; // TODO: make a single update
+    // cout << __func__ << endl; // TODO: make a single update
 }
 
 
@@ -539,7 +539,8 @@ void My_window::set_mouse_controller()
 
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
-    cout << __func__ << endl; // TODO
+    // TODO (rendu 3)
+    // cout << __func__ << endl; 
 }
 
 
