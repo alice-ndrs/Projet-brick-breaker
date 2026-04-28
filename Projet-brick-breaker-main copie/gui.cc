@@ -60,7 +60,6 @@ My_window::My_window(string file_name)
 
     if (!file_name.empty())
     {
-        //m_game.getLevel(file_name);
         if (m_game.getLevel(file_name))
         {
             level_loaded = true;
@@ -84,7 +83,6 @@ My_window::My_window(string file_name)
             drawing.queue_draw();
         }
     }
-        
 }
 
 
@@ -240,10 +238,6 @@ void My_window::step_clicked()
 
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
-
-    //m_game.update();// movement clic par clic de la ball
-
-    // cout << __func__ << endl; // TODO: make a single update
 }
 
 
@@ -375,9 +369,6 @@ bool My_window::loop()
         // TODO: update the game and the interface
         step_clicked();
         return true;
-        // update_infos();
-        // drawing.queue_draw();
-        // return true;
     }
     return false;
 }
@@ -549,42 +540,4 @@ void My_window::on_drawing_move(double x, double y)
     int w = drawing.get_width(); //si la souris bouge, on maj la cible init_x, 
     //mais on ne bouge pas encore la raquette !!
     init_x = x * arena_size / w;
-
-    // ----- ancien on_drawing_move -----
-    // int w=drawing.get_width();//largeur widget
-    // double new_x = x * arena_size / w;
-    
-    // double vx =new_x-init_x;
-
-    // if (abs(vx)>delta_norm_max){ 
-    //     double delta = delta_norm_max;
-    //     if(vx <= 0) { delta=-delta_norm_max;}
-    //     new_x=init_x+delta;
-    // }
-
-    // double old_x=m_game.get_paddle().getX();
-    // m_game.get_paddle().setX(new_x);//mise a jour de la position
-
-    // if (m_game.get_paddle().check_Paddle(false))
-    // {
-    //     m_game.get_paddle().setX(old_x);
-    //     new_x = old_x;
-    // }
-    // else
-    // {
-    //     for (const auto& brick : m_game.get_bricks())
-    //     {
-    //         if (circle_intersects_square(m_game.get_paddle().getCircle(),
-    //                             brick->getSquare()))
-    //         {
-    //             m_game.get_paddle().setX(old_x);
-    //             new_x = old_x;
-    //             break;
-    //         }
-    //     }
-    // }
-
-    // init_x=new_x;
-    // drawing.queue_draw();
-    // cout << __func__ << endl; // TODO : déplacer la raquette avec la souris
 }
