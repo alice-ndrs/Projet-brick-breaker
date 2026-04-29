@@ -1,7 +1,8 @@
-#include "tools.h"
 #include <cmath>
 #include <algorithm>
+
 #include "Constants.h"
+#include "tools.h"
 
 extern const Cairo::RefPtr<Cairo::Context>* ptcr;
 

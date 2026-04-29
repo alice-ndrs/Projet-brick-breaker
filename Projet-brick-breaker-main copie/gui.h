@@ -4,6 +4,7 @@
 #include <array>
 #include <gtkmm.h>
 #include <string>
+#include <filesystem>
 #include "Game.h"
 
 
@@ -43,6 +44,8 @@ private:
 
     void set_dialog(Gtk::FileChooserDialog *dialog);
     void dialog_response(int response, Gtk::FileChooserDialog *dialog);
+    void open_file(const std::filesystem::path& file_name);
+    void save_file(const std::filesystem::path& file_name);
 
     bool loop();
 
@@ -51,6 +54,9 @@ private:
 
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
+    void draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr);
+    void draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr);
+    void draw_balls(const Cairo::RefPtr<Cairo::Context>& cr);
 
     void set_mouse_controller();
     void on_drawing_left_click(int n_press, double x, double y);

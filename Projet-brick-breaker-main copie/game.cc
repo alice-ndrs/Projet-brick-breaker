@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include "Game.h"
-#include "Message.h"
-#include "Brick.h"
 #include <fstream>
 #include <sstream>
+
+#include "Message.h"
+#include "Brick.h"
+#include "Game.h"
+
 using namespace std;
 
 //------------- Constructeur Game -------------
@@ -106,7 +108,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
             return false;
         }
 
-        if (check_Collisions()) {
+        if (check_collisions()) {
             reset();
             return false;
         }
@@ -192,7 +194,7 @@ bool Game::decodage_paddle(istringstream& data)
     if (!is_line_empty(data)) return false;
     
     Paddle p(xPaddle, yPaddle, rPaddle);
-    if (p.check_Paddle()) return false; // limites arene
+    if (p.check_paddle()) return false; // limites arene
     
     this->paddle = p;
     etat = NB_BRICKS;
@@ -235,21 +237,21 @@ bool Game::decodage_brick(istringstream& data)
             if (!(data >> h)) return false;
             if (!is_line_empty(data)) return false;
             std::unique_ptr<Rainbow_brick> b(new Rainbow_brick(x, y, c, h));
-            if (b->check_Brick()) return false;
+            if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
         case 1: {
             if (!is_line_empty(data)) return false;
             std::unique_ptr<Ball_brick> b(new Ball_brick(x, y, c));
-            if (b->check_Brick()) return false;
+            if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
         case 2: {
             if (!is_line_empty(data)) return false;
             std::unique_ptr<Split_brick> b(new Split_brick(x, y, c));
-            if (b->check_Brick()) return false;
+            if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
@@ -295,7 +297,7 @@ bool Game::decodage_ball(istringstream& data)
     if (!is_line_empty(data)) return false;
 
     std::unique_ptr<Ball> b(new Ball(xBall, yBall, rBall, dx, dy));
-    if (b->check_Ball()) {
+    if (b->check_ball()) {
         return false;
     }
     balls.push_back(std::move(b));
@@ -309,7 +311,7 @@ bool Game::decodage_ball(istringstream& data)
 
 //------------- Gestion des collisions -------------
 
-int Game::check_Collisions() const 
+int Game::check_collisions() const 
 {
     if(collision_bricks()) return 1;
     if(collision_balls()) return 1;

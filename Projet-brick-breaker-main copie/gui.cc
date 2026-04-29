@@ -2,8 +2,8 @@
 #include <iostream>
 #include "Constants.h"
 #include "graphic_gui.h"
-#include "gui.h"
 #include "Brick.h"
+#include "gui.h"
 
 using namespace std;
 
@@ -191,41 +191,33 @@ void My_window::start_clicked()
 
 void My_window::step_clicked()
 {
-    if (!level_loaded) return; // Si aucun niveau valide n'est chargé, on ne fait rien
+    if (!level_loaded) return;
 
     double old_x = m_game.get_paddle().getX(); // Position actuelle de la raquette
-
     double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la position actuelle
-
     double new_x = old_x; // Par défaut, on garde l'ancienne position
-
     
-    if (abs(diff) <= delta_norm_max) // Si la cible est proche, on peut aller directement dessus
+    if (abs(diff) <= delta_norm_max) 
     {
         new_x = init_x;
     }
     else
     {
-        // Sinon, on avance seulement d'un "pas" de taille delta_norm_max
         if (diff > 0)
-            new_x = old_x + delta_norm_max;   // vers la droite
+            new_x = old_x + delta_norm_max;
         else
-            new_x = old_x - delta_norm_max;   // vers la gauche
+            new_x = old_x - delta_norm_max;
     }
 
-    // On applique temporairement cette nouvelle position
-    m_game.get_paddle().setX(new_x);
+    m_game.get_paddle().setX(new_x); // nouvelle position temporaire de la raquette
 
-    // Si la nouvelle position sort de la zone autorisée, on annule
-    if (m_game.get_paddle().check_Paddle(false))
+    if (m_game.get_paddle().check_paddle(false))
     {
         m_game.get_paddle().setX(old_x);
     }
     else
     {
-        // Sinon, on vérifie si la raquette touche une brique
-        // Si oui, on annule aussi le déplacement
-        for (const auto& brick : m_game.get_bricks())
+        for (const auto& brick : m_game.get_bricks()) // check collision raquette/brique
         {
             if (circle_intersects_square(m_game.get_paddle().getCircle(),
                                          brick->getSquare()))
@@ -235,7 +227,6 @@ void My_window::step_clicked()
             }
         }
     }
-
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
 }
@@ -252,6 +243,12 @@ void My_window::set_key_controller()
 
 bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state)
 {
+    if (!level_loaded && (keyval == 's' || keyval == '1')) {
+        return true;
+    }
+    
+    if (loop_activated && keyval != 's') return true;
+    
     switch (keyval)
     {
     case '1':
@@ -308,59 +305,70 @@ void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
 void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 {
     filesystem::path file_name = "";
-    if (dialog->get_file())
-    {
+
+    if (dialog->get_file()) {
         file_name = dialog->get_file()->get_path();
-        if (file_name.extension() != ".txt")
-        {
-            file_name = "";
+        if (file_name.extension() != ".txt") { 
+            file_name = ""; 
         }
     }
+
     switch (response)
     {
     case CANCEL:
-        dialog->hide();
         break;
-    case OPEN_FILE:
-        if (file_name != "")
-        {
-            cout << "open file " << file_name << endl; // TODO: set game from a file
-            if (m_game.getLevel(file_name.string()))
-            {
-                level_loaded = true;
-                last_file = file_name.string();
-                init_x = m_game.get_paddle().getX();
-                buttons[SAVE].set_sensitive(true);
-                buttons[START].set_sensitive(true);
-                buttons[STEP].set_sensitive(true);
-            }
-            else
-            {
-                m_game.reset();
-                level_loaded = false;
 
-                buttons[SAVE].set_sensitive(false);
-                buttons[START].set_sensitive(false);
-                buttons[STEP].set_sensitive(false);
-            }
-            update_infos();
-            drawing.queue_draw();
-            dialog->hide();
+    case OPEN_FILE:
+        if (file_name != "") {
+            open_file(file_name);
         }
         break;
+
     case SAVE_FILE:
-        if (file_name != "")
-        {
-            cout << "save file " << file_name << endl; // TODO: save the game
-            m_game.saveLevel(file_name.string());
-            dialog->hide();
+        if (file_name != "") {
+            save_file(file_name);
         }
         break;
+        
     default:
         break;
     }
+
+    dialog->hide();
 }
 
+void My_window::open_file(const std::filesystem::path& file_name) 
+{
+    cout << "open file " << file_name << endl; 
+    
+    if (m_game.getLevel(file_name.string()))
+    {
+        level_loaded = true;
+        last_file = file_name.string();
+        init_x = m_game.get_paddle().getX();
+        buttons[SAVE].set_sensitive(true);
+        buttons[START].set_sensitive(true);
+        buttons[STEP].set_sensitive(true);
+    }
+    else
+    {
+        m_game.reset();
+        level_loaded = false;
+
+        buttons[SAVE].set_sensitive(false);
+        buttons[START].set_sensitive(false);
+        buttons[STEP].set_sensitive(false);
+    }
+
+    update_infos();
+    drawing.queue_draw();
+}
+
+void My_window::save_file(const std::filesystem::path& file_name) 
+{
+    cout << "save file " << file_name << endl; 
+    m_game.saveLevel(file_name.string());
+}
 
 bool My_window::loop()
 {
@@ -393,8 +401,7 @@ void My_window::set_infos()
 void My_window::update_infos()
 // TODO: update the different counters
 {
-    for (auto &value : info_value)
-    {
+    for (auto &value : info_value) {
         value.set_text("0");
     }
     info_value[0].set_text(to_string(m_game.get_score()));
@@ -413,7 +420,8 @@ void My_window::set_drawing()
 }
 
 
-void draw_split_square(Square sq,int niveau){
+void draw_split_square(Square sq,int niveau)
+{
     
     Color color[3]={ORANGE,YELLOW,GREEN};
     if (niveau>2){return;}
@@ -439,7 +447,6 @@ void draw_split_square(Square sq,int niveau){
         draw_square(sq_prime);
         draw_split_square(sq_prime, niveau+ 1);
     }
-
 }
 
 
@@ -455,13 +462,21 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
 
     if (!level_loaded) return;
     
-    
+    draw_paddle(cr);
+    draw_bricks(cr);
+    draw_balls(cr);
+}
+
+void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr) 
+{
     set_color(BLACK);
     draw_arc(m_game.get_paddle().getCircle());
     cr->set_line_width(1.0);
     cr->stroke();
-    
-    // on dessine les briques
+}
+
+void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr) 
+{
     for (const auto& brick : m_game.get_bricks())
     {
         switch (brick->getType()) 
@@ -502,7 +517,10 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
             }
         }         
     }
+}
 
+void My_window::draw_balls(const Cairo::RefPtr<Cairo::Context>& cr) 
+{
     set_color(BLACK);
     for (const auto& ball : m_game.get_balls())
     {
@@ -537,7 +555,20 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    int w = drawing.get_width(); //si la souris bouge, on maj la cible init_x, 
-    //mais on ne bouge pas encore la raquette !!
-    init_x = x * arena_size / w;
+    int width = drawing.get_width();
+    int height = drawing.get_height();
+
+    double side = min(width, height);
+    double offset_x = (width - side) / 2.0;
+
+    // init_x vaut 0 en bas à gauche de l'arène, et pas de la fenêtre de dessin
+    init_x = (x - offset_x) * arena_size / side;
+
+    if (init_x < 0) {
+        init_x = 0;
+    }
+
+    if (init_x > arena_size) {
+        init_x = arena_size;
+    }
 }

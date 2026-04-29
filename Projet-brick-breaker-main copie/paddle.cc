@@ -1,8 +1,10 @@
+#include <cmath>
 #include <iostream>
-#include "Paddle.h"
+
 #include "Message.h"
 #include "Constants.h"
-#include <cmath>
+#include "Paddle.h"
+
 using namespace std;
 
 //------------- Constructeur Paddle -------------
@@ -13,7 +15,7 @@ circle{{x,y}, r}
 
 //------------- Fonction de test pour la classe Paddle -------------
 
-int Paddle::check_Paddle(bool print_error) const
+int Paddle::check_paddle(bool print_error) const
 {
     // Les intersections avec l’axe x doivent exister
     double dx_squared = circle.r * circle.r - 

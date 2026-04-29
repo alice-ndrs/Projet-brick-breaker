@@ -1,9 +1,10 @@
+#include <cmath>
+#include <cairomm/context.h>
+
 #include "graphic.h"
 #include "tools.h"
 #include "Constants.h"
 #include "graphic_gui.h"
-#include <cmath>
-#include <cairomm/context.h>
 
 using namespace std;
 
@@ -94,6 +95,10 @@ void draw_arc(const Circle& c)
 // Dessine l'arène 
 void draw_arena ()
 {
+    set_color(WHITE);
+    (*ptcr)->rectangle(0, 0, arena_size, arena_size);
+    (*ptcr)->fill();
+    
     set_color(GREY);
     (*ptcr)->set_line_width(0.2);
     (*ptcr)->rectangle(0, 0, arena_size, arena_size);

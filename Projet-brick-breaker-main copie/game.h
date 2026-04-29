@@ -23,54 +23,54 @@ enum EtatLecture {// differente lecture
 
 class Game
 {
-    public:
-        Game (int lives = 0,int score = 0);
-        virtual ~Game()=default;
+public:
+    Game (int lives = 0,int score = 0);
+    virtual ~Game()=default;
 
-        bool getLevel (const std::string& filename); // déclaration de la 
-                                                        //fin de lecture de fichier
-        bool saveLevel (const std:: string& filename);
-        // --- Gestion des collisions ---
-        int check_Collisions () const;              
-        bool collision_bricks() const;
-        bool collision_balls() const;
-        bool collision_ball_brick() const;
-        bool collision_ball_paddle() const;
-        bool collision_brick_paddle() const;
+    bool getLevel (const std::string& filename); // déclaration de la 
+                                                    //fin de lecture de fichier
+    bool saveLevel (const std:: string& filename);
+    // --- Gestion des collisions ---
+    int check_collisions () const;              
+    bool collision_bricks() const;
+    bool collision_balls() const;
+    bool collision_ball_brick() const;
+    bool collision_ball_paddle() const;
+    bool collision_brick_paddle() const;
 
-        void reset();  // reinitialise l'etat du jeu
-        void nettoyer_objets();
-        bool decodage_ligne(std::istringstream& data);
+    void reset();  // reinitialise l'etat du jeu
+    void nettoyer_objets();
+    bool decodage_ligne(std::istringstream& data);
 
-        // --- Méthodes de décodage spécifiques ---
-        bool decodage_score(std::istringstream& data);
-        bool decodage_lives(std::istringstream& data);
-        bool decodage_paddle(std::istringstream& data);
-        bool decodage_nb_bricks(std::istringstream& data);
-        bool decodage_brick(std::istringstream& data);
-        bool decodage_nb_balls(std::istringstream& data);
-        bool decodage_ball(std::istringstream& data);
+    // --- Méthodes de décodage spécifiques ---
+    bool decodage_score(std::istringstream& data);
+    bool decodage_lives(std::istringstream& data);
+    bool decodage_paddle(std::istringstream& data);
+    bool decodage_nb_bricks(std::istringstream& data);
+    bool decodage_brick(std::istringstream& data);
+    bool decodage_nb_balls(std::istringstream& data);
+    bool decodage_ball(std::istringstream& data);
 
 
-        bool is_line_empty(std::istringstream& data);//verifie la ligne lue est
-                                          //vide ou ne contient que des espaces
-        
-        const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
-        const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
-        Paddle& get_paddle() { return paddle; }
-        int get_score() {return score;}
-        int get_lives() {return lives;}
-    private:
-        int lives;
-        int score;
+    bool is_line_empty(std::istringstream& data);//verifie la ligne lue est
+                                        //vide ou ne contient que des espaces
+    
+    const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
+    const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
+    Paddle& get_paddle() { return paddle; }
+    int get_score() {return score;}
+    int get_lives() {return lives;}
+private:
+    int lives;
+    int score;
 
-        std::vector<std::unique_ptr<Brick>> bricks;
-        std::vector<std::unique_ptr<Ball>> balls;
+    std::vector<std::unique_ptr<Brick>> bricks;
+    std::vector<std::unique_ptr<Ball>> balls;
 
-        Paddle paddle; // la raquette du joueur
+    Paddle paddle; // la raquette du joueur
 
-        EtatLecture etat;
-        unsigned int total;
-        unsigned int count;
+    EtatLecture etat;
+    unsigned int total;
+    unsigned int count;
 };
 #endif

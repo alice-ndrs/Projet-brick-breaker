@@ -1,8 +1,10 @@
+#include <cmath>
 #include <iostream>
-#include "Ball.h"
+
 #include "Brick.h"
 #include "Message.h"
-#include <cmath>
+#include "Ball.h"
+
 using namespace std;
 
 //------------- Constructeur Ball -------------
@@ -13,7 +15,7 @@ circle{{x,y}, r}, dx(dx), dy(dy), active(true)
 
 //------------- Fonction de test pour la classe Ball -------------
 
-int Ball::check_Ball () const   //verifie si Ball est dans l'arene et 
+int Ball::check_ball () const   //verifie si Ball est dans l'arene et 
 {                                 // et sa vitesse est conforme
     bool outside_x = (circle.center.x - circle.r < 0) 
                     || (circle.center.x + circle.r > arena_size);
