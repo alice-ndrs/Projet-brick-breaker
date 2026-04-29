@@ -38,7 +38,7 @@ public:
     virtual void hit () { remove = true; } //virtual permet de regarder 
     bool clear() const { return remove; }         // les points de vies
 
-    virtual int getHitPoints() const { return 1; };
+    virtual int get_hit_points() const { return 1; };
 
 protected:
     BrickType t; // type de brick parmis les 3
@@ -53,9 +53,9 @@ class Rainbow_brick : public Brick
 public :
     Rainbow_brick(double x, double y, double c, int h);
     int check_specific() const override;
-    void hit() override; //surcharge pour decrementer les vies 
+    void hit() override; // (rendu 3) surcharge pour decrementer les vies 
                         // avant de la detruire
-    int getHitPoints() const override { return hit_points; }
+    int get_hit_points() const override { return hit_points; }
 private : 
     int hit_points; // nbre de coups necessaires pour la casser
 };

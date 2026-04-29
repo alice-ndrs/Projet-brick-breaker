@@ -483,7 +483,7 @@ void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)
         {
             case BrickType::RAINBOW:
             {
-                int hp = brick->getHitPoints();
+                int hp = brick->get_hit_points();
                 if (hp==1) set_color(RED);
                 else if (hp==2) set_color(ORANGE);
                 else if (hp==3) set_color(YELLOW);

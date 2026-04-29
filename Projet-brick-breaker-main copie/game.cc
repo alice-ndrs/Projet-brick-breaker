@@ -134,7 +134,7 @@ bool Game::saveLevel(const string& filename){
             file<<static_cast<int>(bricks[i]->getType())<<" "<<bricks[i]->getX()<<" "<<bricks[i]->getY();
             file<<" "<<bricks[i]->getC();
             if(bricks[i]->getType()==BrickType::RAINBOW){
-                file <<" "<<bricks[i]->getHitPoints();
+                file <<" "<<bricks[i]->get_hit_points();
             }
             file<<endl;
         }
