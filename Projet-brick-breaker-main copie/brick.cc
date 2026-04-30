@@ -1,7 +1,7 @@
 #include <iostream>
-#include "Brick.h"
 #include "Message.h"
 #include "Paddle.h"
+#include "Brick.h"
 using namespace std;
 
 

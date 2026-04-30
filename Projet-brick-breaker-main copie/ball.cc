@@ -1,8 +1,9 @@
 #include <iostream>
-#include "Ball.h"
+#include <cmath>
 #include "Brick.h"
 #include "Message.h"
-#include <cmath>
+#include "Ball.h"
+
 using namespace std;
 
 //------------- Constructeur Ball -------------
@@ -54,7 +55,8 @@ bool Ball::collision_paddle (const Paddle& paddle) const //superposition Paddle
 }
 
 
-void Ball::reset(const Paddle& p) { //replace la Ball sur le Paddle
+void Ball::reset(const Paddle& p) //replace la Ball sur le Paddle
+{ 
     double X = p.getX();
     double Y = p.getY() + p.getR() + new_ball_radius + epsil_zero;
     

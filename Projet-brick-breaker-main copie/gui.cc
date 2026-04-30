@@ -343,9 +343,7 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 }
 
 void My_window::open_file(const std::filesystem::path& file_name) 
-{
-    cout << "open file " << file_name << endl; 
-    
+{   
     if (m_game.getLevel(file_name.string()))
     {
         level_loaded = true;
@@ -363,6 +361,7 @@ void My_window::open_file(const std::filesystem::path& file_name)
         buttons[SAVE].set_sensitive(false);
         buttons[START].set_sensitive(false);
         buttons[STEP].set_sensitive(false);
+        buttons[RESTART].set_sensitive(true);
     }
 
     update_infos();

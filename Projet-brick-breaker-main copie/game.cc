@@ -1,11 +1,12 @@
 #include <iostream>
-#include <vector>
-#include <memory>
-#include "Game.h"
-#include "Message.h"
-#include "Brick.h"
 #include <fstream>
 #include <sstream>
+#include <vector>
+#include <memory>
+#include "Message.h"
+#include "Brick.h"
+#include "Game.h"
+
 using namespace std;
 
 //------------- Constructeur Game -------------
@@ -32,7 +33,7 @@ void Game::nettoyer_objets() // pour les rendus suivants
     for (size_t i = 0; i < balls.size(); ) {
         if (balls[i]->clear()) {
             balls.erase(balls.begin() + i); 
-        }else{
+        } else {
             i++;
         }
     }
@@ -40,7 +41,7 @@ void Game::nettoyer_objets() // pour les rendus suivants
     for (size_t i = 0; i < bricks.size();) {
         if (bricks[i]->clear()) {
             bricks.erase(bricks.begin() + i);
-        } else{
+        } else {
             i++;
         }
     }
@@ -90,7 +91,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
         string line; // lecture ligne par ligne en ignorant les espaces
         while (getline(file>>ws, line)) {
             if (line.empty()) continue;
-            if (line[0]=='#') continue;
+            if (line[0] == '#') continue;
 
             istringstream data(line);
 
@@ -111,37 +112,40 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
             return false;
         }
 
-        cout<<message::success();
+        cout << message::success();
         return true;
     }
     return false;
 }
 
 
-bool Game::saveLevel(const string& filename){
+bool Game::saveLevel(const string& filename)
+{
     ofstream file(filename);
     if (!file.fail()) 
     {
-        file<<score<<endl;
-        file<<lives<<endl;
-        file<<paddle.getX()<<" "<<paddle.getY()<<" "<<paddle.getR()<<endl;
+        file << score << endl;
+        file << lives << endl;
+        file << paddle.getX() << " " << paddle.getY() << " " << paddle.getR() << endl;
 
-        file<<bricks.size()<<endl;
+        file << bricks.size()<< endl;
 
-        for(size_t i = 0; i < bricks.size(); ++i){
-            file<<static_cast<int>(bricks[i]->getType())<<" "<<bricks[i]->getX()<<" "<<bricks[i]->getY();
-            file<<" "<<bricks[i]->getC();
-            if(bricks[i]->getType()==BrickType::RAINBOW){
-                file <<" "<<bricks[i]->get_hit_points();
+        for (size_t i = 0; i < bricks.size(); ++i){
+            file << static_cast<int>(bricks[i]->getType()) << " " 
+                << bricks[i]->getX() << " " 
+                << bricks[i]->getY();
+            file << " " << bricks[i]->getC();
+            if (bricks[i]->getType() == BrickType::RAINBOW){
+                file << " " << bricks[i]->get_hit_points();
             }
-            file<<endl;
+            file << endl;
         }
 
-        file<< balls.size()<<endl;
-        for(size_t i = 0; i < balls.size(); ++i){
-            file<<balls[i]->getX()<<" "<<balls[i]->getY()<<" "<<balls[i]->getR();
-            file<<" "<<balls[i]->getDx()<<" "<<balls[i]->getDy();
-            file<<endl;
+        file << balls.size() << endl;
+        for (size_t i = 0; i < balls.size(); ++i){
+            file << balls[i]->getX() << " " << balls[i]->getY() << " " << balls[i]->getR();
+            file << " " << balls[i]->getDx() << " " << balls[i]->getDy();
+            file << endl;
         }
         return true;
     }
@@ -311,11 +315,11 @@ bool Game::decodage_ball(istringstream& data)
 
 int Game::check_collisions() const 
 {
-    if(collision_bricks()) return 1;
-    if(collision_balls()) return 1;
-    if(collision_ball_brick()) return 1;
-    if(collision_ball_paddle()) return 1;
-    if(collision_brick_paddle()) return 1;
+    if (collision_bricks()) return 1;
+    if (collision_balls()) return 1;
+    if (collision_ball_brick()) return 1;
+    if (collision_ball_paddle()) return 1;
+    if (collision_brick_paddle()) return 1;
     return 0;
 }
 
@@ -386,7 +390,8 @@ bool Game::collision_brick_paddle() const
 }
 
 
-bool Game::is_line_empty(istringstream& data){
-    data>>ws;               // White space: on evite les espaces 
+bool Game::is_line_empty(istringstream& data)
+{
+    data >> ws;               // White space: on evite les espaces 
     return data.eof();      //return false si il rest du text
 }
