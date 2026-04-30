@@ -22,7 +22,7 @@ struct Square {
 
 bool circle_intersects_circle(const Circle& c1, const Circle& c2);
 bool square_intersects_square(const Square& s1, const Square& s2);
-bool circle_intersects_square(const Circle& c, const Square& s);
+bool circle_intersects_square(const Circle& c, const Square& s, bool epsil = true);
 bool square_intersects_circle(const Square& s, const Circle& c);
 
 

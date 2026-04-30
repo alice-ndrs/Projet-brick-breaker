@@ -193,17 +193,17 @@ void My_window::start_clicked()
 
 void My_window::step_clicked()
 {
-    if (!level_loaded) return; // Si aucun niveau valide n'est chargé, on ne fait rien
-
-    double old_x = m_game.get_paddle().getX(); // Position actuelle de la raquette
-
-    double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la position actuelle
-
+    if (!level_loaded) return; // Si aucun niveau valide n'est chargé, 
+                                // on ne fait rien                              
+    double old_x = m_game.get_paddle().getX(); // Position actuelle de la
+                                                // raquette
+    double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la
+                                    //position actuelle
     double new_x = old_x; // Par défaut, on garde l'ancienne position
 
     
-    if (abs(diff) <= delta_norm_max) // Si la cible est proche, on peut aller directement dessus
-    {
+    if (abs(diff) <= delta_norm_max) // Si la cible est proche, on peut 
+    {                                   // aller directement dessus
         new_x = init_x;
     }
     else
@@ -219,7 +219,7 @@ void My_window::step_clicked()
     m_game.get_paddle().setX(new_x);
 
     // Si la nouvelle position sort de la zone autorisée, on annule
-    if (m_game.get_paddle().check_Paddle(false))
+    if (m_game.get_paddle().check_Paddle(false,false))
     {
         m_game.get_paddle().setX(old_x);
     }
@@ -230,7 +230,7 @@ void My_window::step_clicked()
         for (const auto& brick : m_game.get_bricks())
         {
             if (circle_intersects_square(m_game.get_paddle().getCircle(),
-                                         brick->getSquare()))
+                                         brick->getSquare(),false))
             {
                 m_game.get_paddle().setX(old_x);
                 break;

@@ -13,7 +13,7 @@ circle{{x,y}, r}
 
 //------------- Fonction de test pour la classe Paddle -------------
 
-int Paddle::check_Paddle(bool print_error) const
+int Paddle::check_Paddle(bool print_error,bool epsil) const
 {
     // Les intersections avec l’axe x doivent exister
     double dx_squared = circle.r * circle.r - 
@@ -37,8 +37,9 @@ int Paddle::check_Paddle(bool print_error) const
     double dx = sqrt(dx_squared);
     double left  = circle.center.x - dx;
     double right = circle.center.x + dx;
+    double tol =epsil? 0:epsil_zero;
 
-    if (left < 0 || right > arena_size) {
+    if ((left < tol) || (right > arena_size - tol)) {
         if(print_error){
             cout << message::paddle_outside(circle.center.x, circle.center.y);
         }

@@ -27,7 +27,7 @@ bool square_intersects_square(const Square& s1, const Square& s2)
 }
 
 //collision cercle contre carre
-bool circle_intersects_square(const Circle& c, const Square& s)
+bool circle_intersects_square(const Circle& c, const Square& s,bool epsil)
 {
     double half = s.side / 2.0;
 
@@ -42,7 +42,11 @@ bool circle_intersects_square(const Circle& c, const Square& s)
     double dx = c.center.x - closestX;
     double dy = c.center.y - closestY;
 
-    return (dx * dx + dy * dy) < (c.r * c.r);
+    double dist = sqrt(dx*dx + dy*dy);
+
+    double tol = epsil? 0:epsil_zero;
+
+    return (dist - c.r) < tol;
 }
 
 //collision carre contre cercle
