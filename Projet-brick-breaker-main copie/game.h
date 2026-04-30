@@ -31,7 +31,7 @@ class Game
                                                         //fin de lecture de fichier
         bool saveLevel (const std:: string& filename);
         // --- Gestion des collisions ---
-        int check_Collisions () const;              
+        int check_collisions () const;              
         bool collision_bricks() const;
         bool collision_balls() const;
         bool collision_ball_brick() const;

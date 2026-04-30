@@ -14,7 +14,7 @@ class Ball
         Ball (double x,double y,double r,double dx,double dy);
         virtual ~Ball() = default; // destructeur virtuel par défaut
 
-        int check_Ball () const;
+        int check_ball () const;
 
         // --- Détection de collisions ---
         bool collision_ball (const Ball& other) const;

@@ -94,6 +94,10 @@ void draw_arc(const Circle& c)
 // Dessine l'arène 
 void draw_arena ()
 {
+    set_color(WHITE);
+    (*ptcr)->rectangle(0, 0, arena_size, arena_size);
+    (*ptcr)->fill();
+    
     set_color(GREY);
     (*ptcr)->set_line_width(0.2);
     (*ptcr)->rectangle(0, 0, arena_size, arena_size);

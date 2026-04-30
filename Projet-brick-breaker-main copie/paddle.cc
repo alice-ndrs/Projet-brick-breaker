@@ -13,7 +13,7 @@ circle{{x,y}, r}
 
 //------------- Fonction de test pour la classe Paddle -------------
 
-int Paddle::check_Paddle(bool print_error,bool epsil) const
+int Paddle::check_paddle(bool print_error, bool epsil) const
 {
     // Les intersections avec l’axe x doivent exister
     double dx_squared = circle.r * circle.r - 

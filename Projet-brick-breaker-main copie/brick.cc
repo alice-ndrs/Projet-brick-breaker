@@ -25,7 +25,7 @@ Rainbow_brick::Rainbow_brick(double x, double y, double c, int h)
 
 //------------- Fonctions de test pour la classe Brick -------------
 
-int Brick::check_Brick() const
+int Brick::check_brick() const
 { 
     int type_value = static_cast<int>(t); 
     if (type_value < 0 || type_value > 2) { // verifie le type
