@@ -50,7 +50,6 @@ My_window::My_window(string file_name)
     set_mouse_controller();
     set_infos();
     set_drawing();
-    // TODO: set the game
 
     update_infos();
 
@@ -81,6 +80,7 @@ My_window::My_window(string file_name)
             buttons[SAVE].set_sensitive(false);
             buttons[START].set_sensitive(false);
             buttons[STEP].set_sensitive(false);
+
 
             drawing.queue_draw();
         }
@@ -344,11 +344,13 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 
 void My_window::open_file(const std::filesystem::path& file_name) 
 {   
+    last_file = file_name.string();
+
     if (m_game.getLevel(file_name.string()))
     {
         level_loaded = true;
-        last_file = file_name.string();
         init_x = m_game.get_paddle().getX();
+
         buttons[SAVE].set_sensitive(true);
         buttons[START].set_sensitive(true);
         buttons[STEP].set_sensitive(true);
@@ -378,7 +380,6 @@ bool My_window::loop()
 {
     if (loop_activated)
     {
-        // TODO: update the game and the interface
         step_clicked();
         return true;
     }
@@ -403,7 +404,6 @@ void My_window::set_infos()
 
 
 void My_window::update_infos()
-// TODO: update the different counters
 {
     for (auto &value : info_value)
     {
@@ -425,31 +425,32 @@ void My_window::set_drawing()
 }
 
 
-void draw_split_square(Square sq,int niveau){
+void draw_split_square(Square sq,int niveau)
+{
     
-    Color color[3]={ORANGE,YELLOW,GREEN};
-    if (niveau>2){return;}
-    if (sq.side<brick_size_min*2){return;}
+    Color color[3] = {ORANGE, YELLOW, GREEN};
+    if (niveau > 2) {return;}
+    if (sq.side < brick_size_min*2) {return;}
 
-    double s=(sq.side-split_brick_gap)/2;
-    if (s<brick_size_min){return;}
+    double s = (sq.side-split_brick_gap) / 2;
+    if (s < brick_size_min) {return;}
 
-    double o=(split_brick_gap/2)+(s/2);
-    double cx=sq.center.x;
-    double cy=sq.center.y;
+    double o = (split_brick_gap / 2) + (s/2);
+    double cx = sq.center.x;
+    double cy = sq.center.y;
 
     Square new_sq[4] = {
-        {{cx-o, cy-o}, s},
-        {{cx+o, cy-o}, s}, 
-        {{cx-o, cy+o}, s},
-        {{cx+o, cy+o}, s}
+        {{cx - o, cy - o}, s},
+        {{cx + o, cy - o}, s}, 
+        {{cx - o, cy + o}, s},
+        {{cx + o, cy + o}, s}
     };
 
     for (auto& sq_prime:new_sq)
     {
-        set_color(color[niveau]);
-        draw_square(sq_prime);
-        draw_split_square(sq_prime, niveau+ 1);
+        set_color (color[niveau]);
+        draw_square (sq_prime);
+        draw_split_square (sq_prime, niveau+ 1);
     }
 
 }
@@ -458,11 +459,10 @@ void draw_split_square(Square sq,int niveau){
 void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     graphic_set_context(cr);
-    double side(min(width, height));
+    double side (min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
     
-    //TODO
     draw_arena();
 
     if (!level_loaded) return;
@@ -489,13 +489,13 @@ void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)
             case BrickType::RAINBOW:
             {
                 int hp = brick->get_hit_points();
-                if (hp==1) set_color(RED);
-                else if (hp==2) set_color(ORANGE);
-                else if (hp==3) set_color(YELLOW);
-                else if (hp==4) set_color(GREEN);
-                else if (hp==5) set_color(CYAN);
-                else if (hp==6) set_color(BLUE);
-                else if (hp==7) set_color(PURPLE); 
+                if (hp == 1) set_color(RED);
+                else if (hp == 2) set_color(ORANGE);
+                else if (hp == 3) set_color(YELLOW);
+                else if (hp == 4) set_color(GREEN);
+                else if (hp == 5) set_color(CYAN);
+                else if (hp == 6) set_color(BLUE);
+                else if (hp == 7) set_color(PURPLE); 
                 draw_square(brick->getSquare());   
                 break;
             }
@@ -507,8 +507,8 @@ void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)
                 
                 set_color(BLACK);
                 Circle c;
-                c.center=brick->getSquare().center;
-                c.r=new_ball_radius;
+                c.center = brick->getSquare().center;
+                c.r = new_ball_radius;
                 draw_circle(c);
                 cr->fill();
                 break;
@@ -519,6 +519,7 @@ void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)
                 set_color(RED);
                 draw_square(brick->getSquare());
                 draw_split_square(brick->getSquare(), 0); 
+                break;
             }
         }         
     }
