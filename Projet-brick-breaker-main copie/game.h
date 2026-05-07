@@ -7,6 +7,11 @@
 #include "Paddle.h"
 #include <sstream>
 
+enum Status {
+    ONGOING,
+    WON,
+    LOST
+};
 
 enum EtatLecture {// differente lecture
     SCORE,
@@ -60,6 +65,9 @@ public:
     Paddle& get_paddle() { return paddle; }
     int get_score() {return score;}
     int get_lives() {return lives;}
+
+    void update();
+    void update_status();
 private:
     int lives;
     int score;
@@ -67,8 +75,9 @@ private:
     std::vector<std::unique_ptr<Brick>> bricks;
     std::vector<std::unique_ptr<Ball>> balls;
 
-    Paddle paddle; // la raquette du joueur
+    Paddle paddle;
 
+    Status status;
     EtatLecture etat;
     unsigned int total;
     unsigned int count;

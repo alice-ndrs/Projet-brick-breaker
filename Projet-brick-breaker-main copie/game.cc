@@ -26,6 +26,7 @@ void Game::reset()
     bricks.clear();
     balls.clear();
     paddle = Paddle();
+    status = Status::ONGOING;
 }
 
 void Game::nettoyer_objets() // pour les rendus suivants
@@ -152,6 +153,33 @@ bool Game::saveLevel(const string& filename)
     return false;
 
 }
+
+void Game::update() 
+{
+    if (status != Status::ONGOING) return;
+
+    for (auto& ball : balls) {
+        ball->move();
+    }
+
+    update_status();
+}
+
+void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
+{
+    if (bricks.empty()) {
+        score += score_per_life * lives;
+        status = Status :: WON;
+        cout << message :: won();
+    }
+
+    if (balls.empty() && lives == 0) {
+        status = Status :: LOST;
+        cout << message :: lost();
+    }
+}
+
+
 
 //------------- Fonctions de Décodage Spécifiques -------------
 

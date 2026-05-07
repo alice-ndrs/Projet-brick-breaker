@@ -54,6 +54,17 @@ bool Ball::collision_paddle (const Paddle& paddle) const //superposition Paddle
     return circle_intersects_circle(circle, paddle.getCircle());
 }
 
+void Ball::move()
+{
+    circle.center.x += dx;
+    circle.center.y += dy;
+}
+
+void Ball::undo_move()
+{
+    circle.center.x -= dx;
+    circle.center.y -= dy;
+}
 
 void Ball::reset(const Paddle& p) //replace la Ball sur le Paddle
 { 
