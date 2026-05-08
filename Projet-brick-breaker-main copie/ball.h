@@ -20,6 +20,11 @@ class Ball
         bool collision_ball (const Ball& other) const;
         bool collision_brick (const Brick& b) const;
         bool collision_paddle (const Paddle& p) const;
+        bool lost() const;
+        bool hits_vertical_wall() const;
+        bool hits_top_wall() const;
+        void reverse_dx() { dx = -dx; }
+        void reverse_dy() { dy = -dy; }
         
         // --- Accesseurs ---
         double getX() const { return circle.center.x; }

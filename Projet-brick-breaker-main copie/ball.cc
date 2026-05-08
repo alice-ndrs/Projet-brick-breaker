@@ -54,6 +54,25 @@ bool Ball::collision_paddle (const Paddle& paddle) const //superposition Paddle
     return circle_intersects_circle(circle, paddle.getCircle());
 }
 
+bool Ball::lost() const 
+{
+    return circle.center.y < 0;
+}
+
+bool Ball::hits_vertical_wall() const 
+{
+    return circle.center.x - circle.r < 0 ||
+           circle.center.x + circle.r > arena_size;
+}
+
+bool Ball::hits_top_wall() const 
+{
+    return circle.center.y + circle.r > arena_size;
+}
+
+
+
+
 void Ball::move()
 {
     circle.center.x += dx;

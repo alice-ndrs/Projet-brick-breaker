@@ -9,6 +9,13 @@ struct Point {
     double y;
 };
 
+Point operator-(const Point& p1, const Point& p2);
+Point operator+(const Point& p1, const Point& p2);
+Point operator*(double a, const Point& p);
+
+double dot(const Point& p1, const Point& p2);
+double norm2(const Point& p);
+
 struct Circle {
     Point center;
     double r;

@@ -232,6 +232,7 @@ void My_window::step_clicked()
             }
         }
     }
+    m_game.update();
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
 }

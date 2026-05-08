@@ -158,9 +158,8 @@ void Game::update()
 {
     if (status != Status::ONGOING) return;
 
-    for (auto& ball : balls) {
-        ball->move();
-    }
+    update_balls();
+    nettoyer_objets();
 
     update_status();
 }
@@ -179,7 +178,29 @@ void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
     }
 }
 
+void Game::update_balls() 
+{
+    for (auto& ball : balls) 
+    {
+        ball->move();
 
+        if (ball->lost()) {
+            ball->inactive();
+            continue;
+        }
+        if (ball->hits_vertical_wall()) {
+            ball->undo_move();
+            ball->reverse_dx();
+            ball->move();
+        }
+        if (ball->hits_top_wall()) {
+            ball->undo_move();
+            ball->reverse_dy();
+            ball->move();
+        }
+        ball_hits_brick(*ball);
+    }
+}
 
 //------------- Fonctions de Décodage Spécifiques -------------
 
@@ -411,6 +432,25 @@ bool Game::collision_brick_paddle() const
     for (size_t i = 0; i < bricks.size(); ++i) {
         if (bricks[i]->collision_paddle(paddle)) {
             cout << message::collision_paddle_brick(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Game::ball_hits_brick(Ball& ball) 
+{
+    for (auto& brick : bricks)
+    {
+        if (ball.collision_brick(*brick))
+        {
+            ball.undo_move();
+            ball.reverse_dy(); // provisoire, simplifié
+
+            brick->hit();
+            score += score_per_hit;
+
+            ball.move();
             return true;
         }
     }

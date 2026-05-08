@@ -5,6 +5,36 @@
 
 extern const Cairo::RefPtr<Cairo::Context>* ptcr;
 
+// ------- Surcharges d'opérateurs pour les points -------
+
+Point operator-(const Point& p1, const Point& p2)
+{
+    return {p1.x - p2.x, p1.y - p2.y};
+}
+
+Point operator+(const Point& p1, const Point& p2)
+{
+    return {p1.x + p2.x, p1.y + p2.y};
+}
+
+Point operator*(double a, const Point& p)
+{
+    return {a * p.x, a * p.y};
+}
+
+double dot(const Point& p1, const Point& p2)
+{
+    return p1.x * p2.x + p1.y * p2.y;
+}
+
+double norm2(const Point& p)
+{
+    return dot(p, p);
+}
+
+
+// ------- Fonctions de collisions -------
+
 // collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2)
 {

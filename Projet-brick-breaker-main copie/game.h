@@ -42,6 +42,7 @@ public:
     bool collision_ball_brick() const;
     bool collision_ball_paddle() const;
     bool collision_brick_paddle() const;
+    bool ball_hits_brick(Ball& b);
 
     void reset();  // reinitialise l'etat du jeu
     void nettoyer_objets();
@@ -67,8 +68,11 @@ public:
     int get_lives() {return lives;}
 
     void update();
-    void update_status();
+
 private:
+    void update_status();
+    void update_balls();
+
     int lives;
     int score;
 
