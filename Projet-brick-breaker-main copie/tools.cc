@@ -27,7 +27,7 @@ double dot(const Point& p1, const Point& p2)
     return p1.x * p2.x + p1.y * p2.y;
 }
 
-double norm2(const Point& p)
+double squared_norm(const Point& p)
 {
     return dot(p, p);
 }
@@ -38,12 +38,10 @@ double norm2(const Point& p)
 // collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2)
 {
-    double dx = c1.center.x - c2.center.x;
-    double dy = c1.center.y - c2.center.y;
-    double distance_sq = dx * dx + dy * dy;
+    Point d = c1.center - c2.center;
     double radius_sum = c1.r + c2.r;
 
-    return distance_sq < radius_sum * radius_sum;
+    return squared_norm(d) < radius_sum * radius_sum;
 }
 
 // collision carre contre carre
@@ -69,11 +67,9 @@ bool circle_intersects_square(const Circle& c, const Square& s,bool epsil)
     double closestX = std::max(left,  std::min(c.center.x, right));
     double closestY = std::max(bottom, std::min(c.center.y, top));
 
-    double dx = c.center.x - closestX;
-    double dy = c.center.y - closestY;
-
-    double dist = sqrt(dx*dx + dy*dy);
-
+    Point d = c.center - Point{closestX, closestY};
+    double dist = sqrt(squared_norm(d));
+    
     double tol = epsil? 0:epsil_zero;
 
     return (dist - c.r) < tol;

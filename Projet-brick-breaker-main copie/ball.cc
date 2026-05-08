@@ -70,6 +70,11 @@ bool Ball::hits_top_wall() const
     return circle.center.y + circle.r > arena_size;
 }
 
+void Ball::set_delta(double new_dx, double new_dy)
+{
+    dx = new_dx;
+    dy = new_dy;
+}
 
 
 

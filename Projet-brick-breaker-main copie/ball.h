@@ -25,7 +25,8 @@ class Ball
         bool hits_top_wall() const;
         void reverse_dx() { dx = -dx; }
         void reverse_dy() { dy = -dy; }
-        
+        void set_delta(double dx, double dy);
+
         // --- Accesseurs ---
         double getX() const { return circle.center.x; }
         double getY() const { return circle.center.y; }

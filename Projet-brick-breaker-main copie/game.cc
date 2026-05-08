@@ -445,7 +445,31 @@ bool Game::ball_hits_brick(Ball& ball)
         if (ball.collision_brick(*brick))
         {
             ball.undo_move();
-            ball.reverse_dy(); // provisoire, simplifié
+
+            Point difference = ball.getCircle().center - brick->getSquare().center;
+            double half = brick->getC() / 2.0;
+
+            Point bounded = { // pt du carré le + proche du centre de la balle
+                std::max(-half, std::min(difference.x, half)),
+                std::max(-half, std::min(difference.y, half))
+            };
+
+            Point normal = difference - bounded;
+            double normal_squared_norm = squared_norm(normal);
+
+            if (normal_squared_norm > 0)
+            {
+                Point v = {ball.getDx(), ball.getDy()};
+
+                Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
+                Point new_v = v - 2.0 * vn; // on inverse que la normale
+
+                ball.set_delta(new_v.x, new_v.y);
+            }
+            else
+            {
+                ball.reverse_dy();
+            }
 
             brick->hit();
             score += score_per_hit;
