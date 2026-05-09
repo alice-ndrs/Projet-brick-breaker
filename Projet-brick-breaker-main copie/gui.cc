@@ -232,6 +232,8 @@ void My_window::step_clicked()
             }
         }
     }
+
+    m_game.get_paddle().setPrevX(old_x);
     m_game.update();
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();

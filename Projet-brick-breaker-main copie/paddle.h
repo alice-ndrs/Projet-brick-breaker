@@ -15,8 +15,12 @@ class Paddle {
         double getR() const { return circle.r; }
         void setX(double x) { circle.center.x = x; }
         const Circle& getCircle() const { return circle; }
+
+        void setPrevX(double x) { prev_x = x; }
+        double getPrevX() const { return prev_x; }
         
     private:
+        double prev_x = 0.0;
         Circle circle;
 };
 

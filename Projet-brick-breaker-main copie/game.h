@@ -43,6 +43,8 @@ public:
     bool collision_ball_paddle() const;
     bool collision_brick_paddle() const;
     bool ball_hits_brick(Ball& b);
+    bool ball_hits_paddle(Ball& b);
+    bool ball_hits_ball(Ball& b);
 
     void reset();  // reinitialise l'etat du jeu
     void nettoyer_objets();

@@ -178,27 +178,30 @@ void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
     }
 }
 
-void Game::update_balls() 
+void Game::update_balls()
 {
-    for (auto& ball : balls) 
+    for (auto& ball : balls)
     {
         ball->move();
 
         if (ball->lost()) {
-            ball->inactive();
-            continue;
-        }
-        if (ball->hits_vertical_wall()) {
-            ball->undo_move();
-            ball->reverse_dx();
-            ball->move();
-        }
-        if (ball->hits_top_wall()) {
-            ball->undo_move();
-            ball->reverse_dy();
-            ball->move();
-        }
-        ball_hits_brick(*ball);
+        ball->inactive();
+        continue;
+    }
+    if (ball->hits_vertical_wall()) {
+        ball->undo_move();
+        ball->reverse_dx();
+        ball->move();
+    }
+    if (ball->hits_top_wall()) {
+        ball->undo_move();
+        ball->reverse_dy();
+        ball->move();
+    }
+
+    ball_hits_brick(*ball);
+    ball_hits_paddle(*ball);
+    ball_hits_ball(*ball);
     }
 }
 
@@ -471,8 +474,128 @@ bool Game::ball_hits_brick(Ball& ball)
                 ball.reverse_dy();
             }
 
+            if (brick->getType() == BrickType::BALL)
+            {
+                auto new_ball = std::make_unique<Ball>();
+                new_ball->reset(paddle); 
+                new_ball->set_position(brick->getX(), brick->getY());
+                new_ball->set_delta(ball.getDx(), ball.getDy());
+                balls.push_back(std::move(new_ball));
+            }
+            else if (brick->getType() == BrickType::SPLIT)
+            {
+                auto* sb = dynamic_cast<Split_brick*>(brick.get());
+                if (sb)
+                {
+                    auto new_bricks = sb->split();
+                    for (auto& b : new_bricks)
+                        bricks.push_back(std::move(b));
+                }
+            }
+
             brick->hit();
             score += score_per_hit;
+
+            ball.move();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+bool Game::ball_hits_paddle(Ball& ball)
+{
+    if (ball.collision_paddle(paddle))
+    {
+        ball.undo_move();
+
+        // direction nominale balle → paddle (cercle contre cercle)
+        Point diff = ball.getCircle().center - paddle.getCircle().center;
+        double dist = squared_norm(diff);
+
+        if (dist > 0)
+        {
+            Point v= {ball.getDx(), ball.getDy()};
+            Point v_p= {paddle.getX() - paddle.getPrevX(), 0.0};
+
+            Point vn = (dot(v, diff) / dist) * diff;
+            Point vn_other = (dot(v_p, diff) / dist) * diff;
+
+            Point impulsion = 2.0 * (vn_other - vn);
+            Point new_v = v+impulsion;
+
+            double d = sqrt(squared_norm(new_v));
+            if (d > delta_norm_max)
+            {
+                new_v.x *= delta_norm_max / d;
+                new_v.y *= delta_norm_max / d;
+            }
+
+            ball.set_delta(new_v.x, new_v.y);
+        }
+        else
+        {
+            ball.reverse_dy();
+        }
+
+        ball.move();
+        return true;
+    }
+    return false;
+}
+
+
+bool Game::ball_hits_ball(Ball& ball)
+{
+    for (auto& b : balls)
+    {
+        if (&ball == b.get()) continue;
+
+        if(ball.collision_ball(*b)){
+
+            ball.undo_move();
+
+            Point diff = ball.getCircle().center - b->getCircle().center;
+            double dist = squared_norm(diff);
+
+            if (dist > 0)
+            {
+                Point v= {ball.getDx(), ball.getDy()};
+                Point v_b= {b->getDx(),b->getDy()};
+
+                double vn = dot(v, diff) / dist;
+                double vn_other = dot(v_b, diff) / dist;
+
+                double r_autre=b->getR() * b->getR();
+                double r=ball.getR()*ball.getR();
+                double cte=2*r_autre/(r+r_autre);
+
+                double impulsion = cte*(vn_other-vn);
+                Point new_v = v + impulsion*diff;
+                Point new_v_b = v_b - impulsion * (r/r_autre) * diff;
+
+                double d = sqrt(squared_norm(new_v));
+                if (d > delta_norm_max)
+                {
+                    new_v.x *= delta_norm_max / d;
+                    new_v.y *= delta_norm_max / d;
+                }
+                double d_b = sqrt(squared_norm(new_v_b));
+                if (d_b > delta_norm_max)
+                {
+                    new_v_b.x *= delta_norm_max / d_b;
+                    new_v_b.y *= delta_norm_max / d_b;
+                }
+
+                ball.set_delta(new_v.x, new_v.y);
+                b->set_delta(new_v_b.x, new_v_b.y);
+            }
+            else
+            {
+                ball.reverse_dy();
+            }
 
             ball.move();
             return true;

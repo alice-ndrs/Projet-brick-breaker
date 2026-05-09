@@ -65,6 +65,7 @@ class Ball_brick : public Brick
 {
     public :
         Ball_brick(double x, double y, double c);
+        void hit() override;
     private :
         double new_ball_radius; // (rendu 3) rayon de Ball à creer
 };
@@ -74,6 +75,8 @@ class Split_brick : public Brick
 {
     public :
         Split_brick(double x, double y, double c);
+        void hit() override;
+        std::vector<std::unique_ptr<Brick>> split() const;
     private :
         double split_brick_gap;// (rendu 3) parametre pour la de separation
 };

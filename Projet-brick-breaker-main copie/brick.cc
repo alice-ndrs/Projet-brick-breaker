@@ -85,3 +85,35 @@ void Rainbow_brick::hit() {
         remove = true; 
     }
 }
+
+void Ball_brick::hit(){
+    remove=true;
+}
+void Split_brick::hit()
+{
+    remove = true;
+}
+
+std::vector<std::unique_ptr<Brick>> Split_brick::split() const
+{
+    std::vector<std::unique_ptr<Brick>> new_bricks;
+    double s=(square.side-split_brick_gap)/2;
+    
+    if (s < brick_size_min) return new_bricks; 
+    
+    double o = (split_brick_gap / 2) + (s/2);
+    double cx = square.center.x;
+    double cy = square.center.y;
+
+    double positions[4][2] = {
+        {cx - o, cy - o},
+        {cx + o, cy - o},
+        {cx - o, cy + o},
+        {cx + o, cy + o}
+    };
+    
+    for (auto& pos : positions)
+        new_bricks.push_back(std::make_unique<Split_brick>(pos[0], pos[1], s));
+
+    return new_bricks;
+}

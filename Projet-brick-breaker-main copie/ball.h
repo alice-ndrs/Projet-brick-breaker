@@ -1,6 +1,7 @@
 #ifndef BALL_H
 #define BALL_H
 
+#include "Constants.h"
 #include "tools.h"
 #include "Paddle.h"
 
@@ -11,7 +12,7 @@ class Ball
 {
     public:
 
-        Ball (double x,double y,double r,double dx,double dy);
+        Ball (double x=0,double y=0,double r=new_ball_radius,double dx=0,double dy=0);
         virtual ~Ball() = default; // destructeur virtuel par défaut
 
         int check_ball () const;
@@ -41,6 +42,8 @@ class Ball
         void reset(const Paddle& p);  // repositionnement de la ball si lives>0
         void inactive() { active=false; }// desactive la Ball
         bool clear() {return !active; } // indique si la Ball est conservée
+
+        void set_position(double x, double y) { circle.center.x = x; circle.center.y = y; }
 
     private:
         Circle circle;
