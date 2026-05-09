@@ -144,6 +144,7 @@ void My_window::restart_clicked()
             init_x = m_game.get_paddle().getX();
 
             buttons[SAVE].set_sensitive(true);
+            buttons[START].set_label("start");
             buttons[START].set_sensitive(true);
             buttons[STEP].set_sensitive(true);
         }
@@ -384,6 +385,19 @@ bool My_window::loop()
     if (loop_activated)
     {
         step_clicked();
+
+        if (m_game.get_status() != Status::ONGOING)
+        {
+            loop_conn.disconnect();
+            loop_activated = false;
+            buttons[EXIT].set_sensitive(true);
+            buttons[OPEN].set_sensitive(true);
+            buttons[SAVE].set_sensitive(true);
+            buttons[RESTART].set_sensitive(true);
+            buttons[START].set_sensitive(false);
+            buttons[STEP].set_sensitive(false);
+            return false;
+        }
         return true;
     }
     return false;

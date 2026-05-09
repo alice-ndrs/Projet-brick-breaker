@@ -68,6 +68,7 @@ public:
     Paddle& get_paddle() { return paddle; }
     int get_score() {return score;}
     int get_lives() {return lives;}
+    Status get_status () {return status;}
 
     void update();
 

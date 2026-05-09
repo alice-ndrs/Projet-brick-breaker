@@ -457,7 +457,7 @@ bool Game::ball_hits_brick(Ball& ball)
                 std::max(-half, std::min(difference.y, half))
             };
 
-            Point normal = difference - bounded;
+            Point normal = difference - bounded;// pas nominal?? plutot que normal
             double normal_squared_norm = squared_norm(normal);
 
             if (normal_squared_norm > 0)
