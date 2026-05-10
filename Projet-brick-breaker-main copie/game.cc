@@ -115,7 +115,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
             reset();
             return false;
         }
-
+        update_status(); // hmm can be shit
         cout << message::success();
         return true;
     }
@@ -484,60 +484,71 @@ bool Game::ball_hits_brick(Ball& ball)
     {
         if (ball.collision_brick(*brick))
         {
-            ball.undo_move();
+            process_ball_brick_collision(ball, *brick);
+            handle_brick_hit(ball, *brick);
 
-            Point difference = ball.getCircle().center - brick->getSquare().center;
-            double half = brick->getC() / 2.0;
-
-            Point bounded = { // pt du carré le + proche du centre de la balle
-                std::max(-half, std::min(difference.x, half)),
-                std::max(-half, std::min(difference.y, half))
-            };
-
-            Point normal = difference - bounded;// pas nominal?? plutot que normal
-            double normal_squared_norm = squared_norm(normal);
-
-            if (normal_squared_norm > 0)
-            {
-                Point v = {ball.getDx(), ball.getDy()};
-
-                Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
-                Point new_v = v - 2.0 * vn; // on inverse que la normale
-
-                ball.set_delta(new_v.x, new_v.y);
-            }
-            else
-            {
-                ball.reverse_dy();
-            }
-
-            if (brick->getType() == BrickType::BALL)
-            {
-                auto new_ball = std::make_unique<Ball>();
-                new_ball->reset(paddle); 
-                new_ball->set_position(brick->getX(), brick->getY());
-                new_ball->set_delta(ball.getDx(), ball.getDy());
-                balls.push_back(std::move(new_ball));
-            }
-            else if (brick->getType() == BrickType::SPLIT)
-            {
-                auto* sb = dynamic_cast<Split_brick*>(brick.get());
-                if (sb)
-                {
-                    auto new_bricks = sb->split();
-                    for (auto& b : new_bricks)
-                        bricks.push_back(std::move(b));
-                }
-            }
-
-            brick->hit();
             score += score_per_hit;
 
-            ball.move();
             return true;
         }
     }
     return false;
+}
+
+void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
+{
+    Point difference = ball.getCircle().center - brick.getSquare().center;
+    double half = brick.getC() / 2.0;
+
+    Point bounded = { // pt du carré le + proche du centre de la balle
+        std::max(-half, std::min(difference.x, half)),
+        std::max(-half, std::min(difference.y, half))
+    };
+
+    Point normal = difference - bounded;// pas nominal?? plutot que normal
+    double normal_squared_norm = squared_norm(normal);
+
+    ball.undo_move();
+
+    if (normal_squared_norm > 0)
+    {
+        Point v = {ball.getDx(), ball.getDy()};
+
+        Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
+        Point new_v = v - 2.0 * vn; // on inverse que la normale
+
+        ball.set_delta(new_v.x, new_v.y);
+    }
+    else
+    {
+        ball.reverse_dy();
+    }
+    ball.move();
+}
+
+void Game::handle_brick_hit(Ball& ball, Brick& brick)
+{
+    if (brick.getType() == BrickType::BALL)
+    {
+        auto new_ball = std::make_unique<Ball>();
+        new_ball->reset(paddle); 
+        new_ball->set_position(brick.getX(), brick.getY());
+        new_ball->set_delta(ball.getDx(), ball.getDy());
+        balls.push_back(std::move(new_ball));
+    }
+    else if (brick.getType() == BrickType::SPLIT)
+    {
+        auto* sb = dynamic_cast<Split_brick*>(&brick);
+        if (sb)
+        {
+            auto new_bricks = sb->split();
+            for (auto& b : new_bricks) {
+                bricks.push_back(std::move(b));
+            }
+        }
+    }
+
+    brick.hit();
 }
 
 

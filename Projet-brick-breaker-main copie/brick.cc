@@ -12,11 +12,11 @@ Brick::Brick(BrickType t, double x, double y, double c) :
 {}
 
 Ball_brick::Ball_brick(double x, double y, double c)
-    : Brick(BrickType::BALL, x, y, c), new_ball_radius(::new_ball_radius)
+    : Brick(BrickType::BALL, x, y, c)
 {}
 
 Split_brick::Split_brick(double x, double y, double c)
-    : Brick(BrickType::SPLIT, x, y, c), split_brick_gap(::split_brick_gap)
+    : Brick(BrickType::SPLIT, x, y, c)
 {}
 
 Rainbow_brick::Rainbow_brick(double x, double y, double c, int h)

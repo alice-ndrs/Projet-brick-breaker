@@ -77,6 +77,9 @@ private:
     void update_status();
     void update_balls();
 
+    void process_ball_brick_collision(Ball& ball, const Brick& brick);
+    void handle_brick_hit(Ball& ball, Brick& brick);
+
     int lives;
     int score;
 
