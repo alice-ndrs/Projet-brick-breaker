@@ -136,6 +136,10 @@ void My_window::save_clicked()
 
 void My_window::restart_clicked()
 {
+    loop_conn.disconnect();
+    loop_activated = false;
+    buttons[START].set_label("start");
+    
     if (!last_file.empty())
     {
         if (m_game.getLevel(last_file))
@@ -195,46 +199,7 @@ void My_window::step_clicked()
 {
     if (!level_loaded) return;
 
-    double old_x = m_game.get_paddle().getX(); // Position actuelle de la
-                                                // raquette
-    double diff = init_x - old_x; // Ecart entre la cible souris (init_x) et la
-                                    //position actuelle
-    double new_x = old_x; // Par défaut, on garde l'ancienne position
-
-    
-    if (abs(diff) <= delta_norm_max)
-    {   
-        new_x = init_x;
-    }
-    else
-    {
-        if (diff > 0)
-            new_x = old_x + delta_norm_max;
-        else
-            new_x = old_x - delta_norm_max;
-    }
-
-    // nouvelle position temporaire de la raquette
-    m_game.get_paddle().setX(new_x);
-
-    if (m_game.get_paddle().check_paddle(false,false))
-    {
-        m_game.get_paddle().setX(old_x);
-    }
-    else
-    {
-        for (const auto& brick : m_game.get_bricks())
-        {
-            if (circle_intersects_square(m_game.get_paddle().getCircle(),
-                                         brick->getSquare(),false))
-            {
-                m_game.get_paddle().setX(old_x);
-                break;
-            }
-        }
-    }
-
-    m_game.get_paddle().setPrevX(old_x);
+    m_game.update_paddle(init_x);
     m_game.update();
     update_infos(); // On met à jour l'affichage
     drawing.queue_draw();
@@ -349,6 +314,10 @@ void My_window::dialog_response(int response, Gtk::FileChooserDialog *dialog)
 void My_window::open_file(const std::filesystem::path& file_name) 
 {   
     last_file = file_name.string();
+
+    loop_conn.disconnect();
+    loop_activated = false;
+    buttons[START].set_label("start");
 
     if (m_game.getLevel(file_name.string()))
     {

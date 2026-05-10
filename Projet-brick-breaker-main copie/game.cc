@@ -185,6 +185,47 @@ void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
     }
 }
 
+void Game::update_paddle(double target_x)
+{
+    double old_x = paddle.getX();
+    double diff = target_x - old_x;
+    double new_x = old_x;
+
+    if (std::abs(diff) <= delta_norm_max)
+    {   
+        new_x = target_x;
+    }
+    else
+    {
+        if (diff > 0) {
+            new_x = old_x + delta_norm_max;
+        }
+        else {
+            new_x = old_x - delta_norm_max;
+        }
+    }
+
+    paddle.setX(new_x);
+
+    if (paddle.check_paddle(false, false))
+    {
+        paddle.setX(old_x);
+    }
+    else
+    {
+        for (const auto& brick : bricks)
+        {
+            if (circle_intersects_square(paddle.getCircle(),
+                    brick->getSquare(), false))
+            {
+                paddle.setX(old_x);
+                break;
+            }
+        }
+    }
+    paddle.setPrevX(old_x);
+}
+
 void Game::update_balls()
 {
     for (auto& ball : balls)

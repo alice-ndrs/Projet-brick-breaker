@@ -72,6 +72,7 @@ public:
     Status get_status () {return status;}
 
     void update();
+    void update_paddle(double target_x);
 
 private:
     void update_status();
