@@ -570,8 +570,12 @@ void My_window::set_mouse_controller()
 
 void My_window::on_drawing_left_click(int n_press, double x, double y)
 {
-    // TODO (rendu 3)
-    // cout << __func__ << endl; 
+    if (!level_loaded) return;
+
+    m_game.create_new_ball();
+
+    update_infos();
+    drawing.queue_draw();
 }
 
 

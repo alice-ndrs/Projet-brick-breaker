@@ -49,6 +49,7 @@ public:
     void reset();  // reinitialise l'etat du jeu
     void nettoyer_objets();
     bool decodage_ligne(std::istringstream& data);
+    void create_new_ball();
 
     // --- Méthodes de décodage spécifiques ---
     bool decodage_score(std::istringstream& data);

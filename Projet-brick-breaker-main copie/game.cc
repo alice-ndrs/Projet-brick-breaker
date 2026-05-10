@@ -3,6 +3,8 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <algorithm>
+#include <cmath>
 #include "Message.h"
 #include "Brick.h"
 #include "Game.h"
@@ -11,8 +13,9 @@ using namespace std;
 
 //------------- Constructeur Game -------------
 
-Game::Game (int lives,int score):
-lives(lives),score(score), paddle(), etat(SCORE), total(0), count(0)
+Game::Game (int lives,int score)
+    : lives(lives),score(score), paddle(), 
+    status(Status::ONGOING), etat(SCORE), total(0), count(0)
 {}
 
 //reinitialise l'etat du jeu
@@ -166,15 +169,19 @@ void Game::update()
 
 void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
 {
+    if (status != Status::ONGOING) return;
+    
     if (bricks.empty()) {
         score += score_per_life * lives;
         status = Status :: WON;
         cout << message :: won();
+        return;
     }
 
     if (balls.empty() && lives == 0) {
         status = Status :: LOST;
         cout << message :: lost();
+        return;
     }
 }
 
@@ -183,26 +190,56 @@ void Game::update_balls()
     for (auto& ball : balls)
     {
         ball->move();
-
         if (ball->lost()) {
-        ball->inactive();
-        continue;
-    }
-    if (ball->hits_vertical_wall()) {
-        ball->undo_move();
-        ball->reverse_dx();
-        ball->move();
-    }
-    if (ball->hits_top_wall()) {
-        ball->undo_move();
-        ball->reverse_dy();
-        ball->move();
-    }
+            ball->inactive();
+            continue;
+        }
 
-    ball_hits_brick(*ball);
-    ball_hits_paddle(*ball);
-    ball_hits_ball(*ball);
+        unsigned nb_bounce = 0;
+        bool collision = true;
+
+        while (collision && nb_bounce < nb_bounce_max)
+        {
+            collision = false;
+
+            if (ball->hits_vertical_wall()) {
+                ball->undo_move();
+                ball->reverse_dx();
+                ball->move();
+                collision = true;
+            }
+            else if (ball->hits_top_wall()) {
+                ball->undo_move();
+                ball->reverse_dy();
+                ball->move();
+                collision = true;
+            }
+            else if (ball_hits_brick(*ball)) {collision = true;}
+            else if (ball_hits_paddle(*ball)) {collision = true;}
+            else if (ball_hits_ball(*ball)) {collision = true;}
+
+            if (collision) {++nb_bounce;}
+            
+            if (ball->lost()) {
+                ball->inactive();
+                break;
+            }
+        }
+        if (nb_bounce >= nb_bounce_max) {ball->undo_move();}
     }
+}
+
+void Game::create_new_ball()
+{
+    if (status != Status::ONGOING) return;
+    if (!balls.empty()) return;
+    if (lives <= 0) return;
+
+    auto ball = std::make_unique<Ball>();
+    ball->reset(paddle);
+
+    balls.push_back(std::move(ball));
+    --lives;
 }
 
 //------------- Fonctions de Décodage Spécifiques -------------

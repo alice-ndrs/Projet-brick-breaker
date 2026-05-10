@@ -1,6 +1,8 @@
 #ifndef BRICK_H
 #define BRICK_H
 
+#include <vector>
+#include <memory>
 #include "tools.h"
 #include "Constants.h"
 
