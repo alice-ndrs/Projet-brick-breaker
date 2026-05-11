@@ -28,6 +28,8 @@ void Game::reset()
     score = 0;
     bricks.clear();
     balls.clear();
+    pending_balls.clear();
+    pending_bricks.clear();
     paddle = Paddle();
     status = Status::ONGOING;
 }
@@ -162,6 +164,7 @@ void Game::update()
     if (status != Status::ONGOING) return;
 
     update_balls();
+    add_pending_objects();
     nettoyer_objets();
 
     update_status();
@@ -281,6 +284,21 @@ void Game::create_new_ball()
 
     balls.push_back(std::move(ball));
     --lives;
+}
+
+void Game::add_pending_objects()
+{
+    for (auto& ball : pending_balls)
+    {
+        balls.push_back(std::move(ball));
+    }
+    pending_balls.clear();
+
+    for (auto& brick : pending_bricks)
+    {
+        bricks.push_back(std::move(brick));
+    }
+    pending_bricks.clear();
 }
 
 //------------- Fonctions de Décodage Spécifiques -------------
@@ -598,13 +616,13 @@ void Game::handle_brick_hit(Ball& ball, Brick& brick)
         new_ball->set_position(x, y);
         new_ball->set_delta(ball.getDx(), ball.getDy());
 
-        balls.push_back(std::move(new_ball));
+        pending_balls.push_back(std::move(new_ball));
     }
 
     // On ajoute les sous-briques seulement après brick.hit()
     for (auto& new_brick : new_bricks)
     {
-        bricks.push_back(std::move(new_brick));
+        pending_bricks.push_back(std::move(new_brick));
     }
 }
 
