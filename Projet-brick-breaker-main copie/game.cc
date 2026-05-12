@@ -523,7 +523,7 @@ bool Game::ball_hits_brick(Ball& ball)
 {
     for (auto& brick : bricks)
     {
-        if (ball.collision_brick(*brick))
+        if (ball.collision_brick(*brick,false))
         {
             process_ball_brick_collision(ball, *brick);
             handle_brick_hit(ball, *brick);
@@ -596,7 +596,7 @@ void Game::handle_brick_hit(Ball& ball, Brick& brick)
 
 bool Game::ball_hits_paddle(Ball& ball)
 {
-    if (ball.collision_paddle(paddle))
+    if (ball.collision_paddle(paddle,false))
     {
         ball.undo_move();
 
@@ -642,7 +642,7 @@ bool Game::ball_hits_ball(Ball& ball)
     {
         if (&ball == b.get()) continue;
 
-        if(ball.collision_ball(*b)){
+        if(ball.collision_ball(*b,false)){
 
             ball.undo_move();
 

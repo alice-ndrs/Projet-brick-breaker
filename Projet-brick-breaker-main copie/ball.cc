@@ -37,21 +37,21 @@ int Ball::check_ball () const   //verifie si Ball est dans l'arene et
 
 // --- Détection de collisions ---
 
-bool Ball::collision_ball (const Ball& other) const // 2 Ball se superpose
+bool Ball::collision_ball (const Ball& other,bool epsil) const // 2 Ball se superpose
 {
-    return circle_intersects_circle(circle, other.circle);
+    return circle_intersects_circle(circle, other.circle,epsil);
 }
 
 
-bool Ball::collision_brick (const Brick& b) const //superposition Brick et Ball
+bool Ball::collision_brick (const Brick& b,bool epsil) const //superposition Brick et Ball
 {
-    return circle_intersects_square(circle, b.getSquare());
+    return circle_intersects_square(circle, b.getSquare(),epsil);
 }
 
 
-bool Ball::collision_paddle (const Paddle& paddle) const //superposition Paddle
+bool Ball::collision_paddle (const Paddle& paddle,bool epsil) const //superposition Paddle
 {                                                        //    et Ball
-    return circle_intersects_circle(circle, paddle.getCircle());
+    return circle_intersects_circle(circle, paddle.getCircle(),epsil);
 }
 
 bool Ball::lost() const 

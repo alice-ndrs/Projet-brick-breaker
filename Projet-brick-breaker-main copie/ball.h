@@ -18,9 +18,9 @@ class Ball
         int check_ball () const;
 
         // --- Détection de collisions ---
-        bool collision_ball (const Ball& other) const;
-        bool collision_brick (const Brick& b) const;
-        bool collision_paddle (const Paddle& p) const;
+        bool collision_ball (const Ball& other,bool epsil=true) const;
+        bool collision_brick (const Brick& b,bool epsil=true) const;
+        bool collision_paddle (const Paddle& p,bool epsil=true) const;
         bool lost() const;
         bool hits_vertical_wall() const;
         bool hits_top_wall() const;

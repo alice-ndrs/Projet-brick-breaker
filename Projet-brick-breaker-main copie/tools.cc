@@ -36,10 +36,12 @@ double squared_norm(const Point& p)
 // ------- Fonctions de collisions -------
 
 // collision cercle contre cercle
-bool circle_intersects_circle(const Circle& c1, const Circle& c2)
+bool circle_intersects_circle(const Circle& c1, const Circle& c2,bool epsil)
 {
+    double tol = epsil? 0:epsil_zero;
+    
     Point d = c1.center - c2.center;
-    double radius_sum = c1.r + c2.r;
+    double radius_sum = c1.r + c2.r + tol;
 
     return squared_norm(d) < radius_sum * radius_sum;
 }
