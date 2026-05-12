@@ -28,6 +28,8 @@ void Game::reset()
     score = 0;
     bricks.clear();
     balls.clear();
+    pending_balls.clear();
+    pending_bricks.clear();
     paddle = Paddle();
     status = Status::ONGOING;
 }
@@ -162,6 +164,7 @@ void Game::update()
     if (status != Status::ONGOING) return;
 
     update_balls();
+    add_pending_objects();
     nettoyer_objets();
 
     update_status();
@@ -281,6 +284,21 @@ void Game::create_new_ball()
 
     balls.push_back(std::move(ball));
     --lives;
+}
+
+void Game::add_pending_objects()
+{
+    for (auto& ball : pending_balls)
+    {
+        balls.push_back(std::move(ball));
+    }
+    pending_balls.clear();
+
+    for (auto& brick : pending_bricks)
+    {
+        bricks.push_back(std::move(brick));
+    }
+    pending_bricks.clear();
 }
 
 //------------- Fonctions de Décodage Spécifiques -------------
@@ -523,6 +541,8 @@ bool Game::ball_hits_brick(Ball& ball)
 {
     for (auto& brick : bricks)
     {
+        if (brick->clear()) continue;
+
         if (ball.collision_brick(*brick,false))
         {
             process_ball_brick_collision(ball, *brick);
@@ -562,35 +582,50 @@ void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
     }
     else
     {
-        ball.reverse_dy();
+        // pour éviter "effet tunnel"
+        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) { ball.reverse_dx(); }
+        else { ball.reverse_dy(); }
     }
     ball.move();
 }
 
 void Game::handle_brick_hit(Ball& ball, Brick& brick)
 {
-    if (brick.getType() == BrickType::BALL)
+    BrickType type = brick.getType();
+    double x = brick.getX();
+    double y = brick.getY();
+
+    std::vector<std::unique_ptr<Brick>> new_bricks;
+
+    // On prépare les nouvelles briques avant de modifier le vector bricks
+    if (type == BrickType::SPLIT)
     {
-        auto new_ball = std::make_unique<Ball>();
-        new_ball->reset(paddle); 
-        new_ball->set_position(brick.getX(), brick.getY());
-        new_ball->set_delta(ball.getDx(), ball.getDy());
-        balls.push_back(std::move(new_ball));
-    }
-    else if (brick.getType() == BrickType::SPLIT)
-    {
-        auto* sb = dynamic_cast<Split_brick*>(&brick);
-        if (sb)
+        auto* split_brick = dynamic_cast<Split_brick*>(&brick);
+        if (split_brick)
         {
-            auto new_bricks = sb->split();
-            for (auto& b : new_bricks) {
-                bricks.push_back(std::move(b));
-            }
+            new_bricks = split_brick->split();
         }
     }
 
+    // L'ancienne brique est marquée comme détruite / décrémentée
     brick.hit();
+
+    if (type == BrickType::BALL)
+    {
+        auto new_ball = std::make_unique<Ball>();
+        new_ball->set_position(x, y);
+        new_ball->set_delta(ball.getDx(), ball.getDy());
+
+        pending_balls.push_back(std::move(new_ball));
+    }
+
+    // On ajoute les sous-briques seulement après brick.hit()
+    for (auto& new_brick : new_bricks)
+    {
+        pending_bricks.push_back(std::move(new_brick));
+    }
 }
+
 
 
 

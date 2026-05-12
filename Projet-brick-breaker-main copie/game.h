@@ -80,10 +80,13 @@ private:
 
     void process_ball_brick_collision(Ball& ball, const Brick& brick);
     void handle_brick_hit(Ball& ball, Brick& brick);
+    void add_pending_objects();
 
     int lives;
     int score;
 
+    std::vector<std::unique_ptr<Ball>> pending_balls;
+    std::vector<std::unique_ptr<Brick>> pending_bricks;
     std::vector<std::unique_ptr<Brick>> bricks;
     std::vector<std::unique_ptr<Ball>> balls;
 
