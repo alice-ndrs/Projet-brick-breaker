@@ -54,11 +54,6 @@ My_window::My_window(string file_name)
     update_infos();
     update_buttons();
 
-    // buttons[SAVE].set_sensitive(false);
-    // buttons[START].set_sensitive(false);
-    // buttons[STEP].set_sensitive(false);
-    // buttons[RESTART].set_sensitive(false);
-
     if (!file_name.empty())
     {
         if (m_game.get_level(file_name))
@@ -67,11 +62,6 @@ My_window::My_window(string file_name)
             init_x = m_game.get_paddle().getX();
             update_buttons();
 
-            // buttons[SAVE].set_sensitive(true);
-            // buttons[START].set_sensitive(true);
-            // buttons[STEP].set_sensitive(true);
-            // buttons[RESTART].set_sensitive(true);
-
             drawing.queue_draw();
         }
         else
@@ -79,11 +69,6 @@ My_window::My_window(string file_name)
             m_game.reset();
             level_loaded = false;
             update_buttons();
-
-            // buttons[SAVE].set_sensitive(false);
-            // buttons[START].set_sensitive(false);
-            // buttons[STEP].set_sensitive(false);
-
 
             drawing.queue_draw();
         }
@@ -150,21 +135,12 @@ void My_window::restart_clicked()
             level_loaded = true;
             init_x = m_game.get_paddle().getX();
             update_buttons();
-
-            // buttons[SAVE].set_sensitive(true);
-            // buttons[START].set_label("start");
-            // buttons[START].set_sensitive(true);
-            // buttons[STEP].set_sensitive(true);
         }
         else
         {
             m_game.reset();
             level_loaded = false;
             update_buttons();
-
-            // buttons[SAVE].set_sensitive(false);
-            // buttons[START].set_sensitive(false);
-            // buttons[STEP].set_sensitive(false);
         }
         update_infos();
         drawing.queue_draw();
@@ -363,10 +339,7 @@ bool My_window::loop()
             buttons[EXIT].set_sensitive(true);
             buttons[OPEN].set_sensitive(true);
             update_buttons();
-            // buttons[SAVE].set_sensitive(true);
-            // buttons[RESTART].set_sensitive(true);
-            // buttons[START].set_sensitive(false);
-            // buttons[STEP].set_sensitive(false);
+
             return false;
         }
         return true;
