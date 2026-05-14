@@ -37,7 +37,7 @@ int Paddle::check_paddle(bool print_error, bool epsil) const
     double dx = sqrt(dx_squared);
     double left  = circle.center.x - dx;
     double right = circle.center.x + dx;
-    double tol =epsil? 0:epsil_zero;
+    double tol = epsil? epsil_zero : 0.0;
 
     if ((left < tol) || (right > arena_size - tol)) {
         if(print_error){

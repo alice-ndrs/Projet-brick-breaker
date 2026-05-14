@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
-#include <memory>
 #include <algorithm>
 #include <cmath>
 #include "Message.h"
@@ -34,7 +32,7 @@ void Game::reset()
     status = Status::ONGOING;
 }
 
-void Game::nettoyer_objets() // pour les rendus suivants
+void Game::nettoyer_objets()
 {
     for (size_t i = 0; i < balls.size(); ) {
         if (balls[i]->clear()) {
@@ -87,7 +85,7 @@ bool Game::decodage_ligne(istringstream& data)
 }
 
 
-bool Game::getLevel(const string& filename) // méthode de lecture de fichier
+bool Game::get_level(const string& filename) // méthode de lecture de fichier
 { 
     reset();  // On repart de zero avant de charger
 
@@ -125,7 +123,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
 }
 
 
-bool Game::saveLevel(const string& filename)
+bool Game::save_level(const string& filename)
 {
     ofstream file(filename);
     if (!file.fail()) 
@@ -173,35 +171,35 @@ void Game::update_status()
 {
     if (status != Status::ONGOING) return;
     
+    if (balls.empty() && lives == 0) 
+    {
+        status = Status::LOST;
+        cout << message::lost();
+        return;
+    }
+    
     if (bricks.empty()) 
     {
         score += score_per_life * lives;
-        status = Status :: WON;
-        cout << message :: won();
-        return;
-    }
-
-    if (balls.empty() && lives == 0) 
-    {
-        status = Status :: LOST;
-        cout << message :: lost();
+        status = Status::WON;
+        cout << message::won();
         return;
     }
 }
 
 void Game::set_initial_status()
 {
-    if (bricks.empty()) 
-    {
-        status = Status::WON;
-        cout << message::won();
-        return;
-    }
-
     if (balls.empty() && lives == 0) 
     {
         status = Status::LOST;
         cout << message::lost();
+        return;
+    }
+
+    if (bricks.empty()) 
+    {
+        status = Status::WON;
+        cout << message::won();
         return;
     }
 
@@ -230,7 +228,7 @@ void Game::update_paddle(double target_x)
 
     paddle.setX(new_x);
 
-    if (paddle.check_paddle(false, false))
+    if (paddle.check_paddle(false, true))
     {
         paddle.setX(old_x);
     }
@@ -239,7 +237,7 @@ void Game::update_paddle(double target_x)
         for (const auto& brick : bricks)
         {
             if (circle_intersects_square(paddle.getCircle(),
-                    brick->getSquare(), false))
+                    brick->getSquare(), true))
             {
                 paddle.setX(old_x);
                 break;
@@ -563,7 +561,7 @@ bool Game::ball_hits_brick(Ball& ball)
     {
         if (brick->clear()) continue;
 
-        if (ball.collision_brick(*brick,false))
+        if (ball.collision_brick(*brick, true))
         {
             Point incident_delta = {ball.getDx(), ball.getDy()};
             
@@ -588,7 +586,7 @@ void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
         std::max(-half, std::min(difference.y, half))
     };
 
-    Point normal = difference - bounded;// pas nominal?? plutot que normal
+    Point normal = difference - bounded;// direction nominale/normale du choc
     double normal_squared_norm = squared_norm(normal);
 
     ball.undo_move();
@@ -653,13 +651,13 @@ void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
 
 bool Game::ball_hits_paddle(Ball& ball)
 {
-    if (ball.collision_paddle(paddle,false))
+    if (ball.collision_paddle(paddle, true))
     {
-        ball.undo_move();
-
         // direction nominale balle → paddle (cercle contre cercle)
         Point diff = ball.getCircle().center - paddle.getCircle().center;
         double dist = squared_norm(diff);
+
+        ball.undo_move();
 
         if (dist > 0)
         {
@@ -699,12 +697,12 @@ bool Game::ball_hits_ball(Ball& ball)
     {
         if (&ball == b.get()) continue;
 
-        if(ball.collision_ball(*b,false)){
-
-            ball.undo_move();
+        if(ball.collision_ball(*b, true)){
 
             Point diff = ball.getCircle().center - b->getCircle().center;
             double dist = squared_norm(diff);
+
+            ball.undo_move();
 
             if (dist > 0)
             {
@@ -714,12 +712,12 @@ bool Game::ball_hits_ball(Ball& ball)
                 double vn = dot(v, diff) / dist;
                 double vn_other = dot(v_b, diff) / dist;
 
-                double r_autre=b->getR() * b->getR();
-                double r=ball.getR()*ball.getR();
-                double cte=2*r_autre/(r+r_autre);
+                double r_autre = b->getR() * b->getR();
+                double r = ball.getR() * ball.getR();
+                double cte = 2 * r_autre / (r+r_autre);
 
-                double impulsion = cte*(vn_other-vn);
-                Point new_v = v + impulsion*diff;
+                double impulsion = cte * (vn_other-vn);
+                Point new_v = v + impulsion * diff;
                 Point new_v_b = v_b - impulsion * (r/r_autre) * diff;
 
                 double d = sqrt(squared_norm(new_v));

@@ -70,9 +70,9 @@ bool Brick::collision_brick (const Brick& other) const //superposition 2 Brick
 }
 
 
-bool Brick::collision_paddle (const Paddle& p) const //superposition Brick
+bool Brick::collision_paddle (const Paddle& p, bool epsil) const //superposition Brick
 {                                                   // et Paddle 
-    return square_intersects_circle(square, p.getCircle());
+    return square_intersects_circle(square, p.getCircle(), epsil);
 }
 
 

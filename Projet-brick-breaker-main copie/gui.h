@@ -14,9 +14,8 @@ public:
     using Gtk::Window::Window;
     My_window(std::string file_name);
 
-    double init_x=0;
-
 private:
+    double init_x=0;
     Game m_game;
     std::string last_file;
     bool level_loaded = false;

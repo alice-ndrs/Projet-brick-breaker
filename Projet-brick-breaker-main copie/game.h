@@ -35,8 +35,8 @@ public:
     Game (int lives = 0,int score = 0);
     virtual ~Game() = default;
 
-    bool getLevel (const std::string& filename);
-    bool saveLevel (const std:: string& filename);
+    bool get_level (const std::string& filename);
+    bool save_level (const std::string& filename);
 
     void reset();
     void update();
@@ -46,7 +46,7 @@ public:
     const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
     const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
     
-    Paddle& get_paddle() { return paddle; }
+    const Paddle& get_paddle() const { return paddle; }
 
     int get_score() const {return score;}
     int get_lives() const {return lives;}

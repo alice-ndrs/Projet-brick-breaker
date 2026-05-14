@@ -17,9 +17,9 @@ class Ball
         int check_ball () const;
 
         // --- Détection de collisions ---
-        bool collision_ball (const Ball& other,bool epsil=true) const;
-        bool collision_brick (const Brick& b,bool epsil=true) const;
-        bool collision_paddle (const Paddle& p,bool epsil=true) const;
+        bool collision_ball (const Ball& other,bool epsil=false) const;
+        bool collision_brick (const Brick& b,bool epsil=false) const;
+        bool collision_paddle (const Paddle& p,bool epsil=false) const;
         bool lost() const;
         bool hits_vertical_wall() const;
         bool hits_top_wall() const;
@@ -43,12 +43,12 @@ class Ball
         bool clear() const {return !active; } // indique si la Ball est conservée
 
         void set_position(double x, double y) { circle.center.x = x; circle.center.y = y; }
-        void clamp_delta();
 
     private:
         Circle circle;
         double dx=0.0,dy=0.0;// vecteur deplacement
         bool active;    // indique si la Ball est active ou pas
+        void clamp_delta();
 };
 
 #endif

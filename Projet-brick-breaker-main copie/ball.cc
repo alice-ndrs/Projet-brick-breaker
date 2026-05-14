@@ -62,13 +62,13 @@ bool Ball::lost() const
 
 bool Ball::hits_vertical_wall() const 
 {
-    return circle.center.x - circle.r < 0 ||
-           circle.center.x + circle.r > arena_size;
+    return circle.center.x - circle.r < epsil_zero ||
+           circle.center.x + circle.r > arena_size - epsil_zero;
 }
 
 bool Ball::hits_top_wall() const 
 {
-    return circle.center.y + circle.r > arena_size;
+    return circle.center.y + circle.r > arena_size - epsil_zero;
 }
 
 void Ball::set_delta(double new_dx, double new_dy)
@@ -111,6 +111,7 @@ void Ball::reset(const Paddle& p) //replace la Ball sur le Paddle
     circle.r = new_ball_radius;
     dx = 0;
     dy = new_ball_delta_norm;
+    clamp_delta();
     active = true;
 }
 

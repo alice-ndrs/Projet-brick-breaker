@@ -28,7 +28,7 @@ class Brick
 
         // --- Détection de collisions ---
         bool collision_brick (const Brick& other) const;
-        bool collision_paddle (const Paddle& p) const;
+        bool collision_paddle (const Paddle& p, bool epsil = false) const;
 
         // --- Accesseurs ---
         double getX() const { return square.center.x; }
@@ -40,7 +40,7 @@ class Brick
         virtual void hit () { remove = true; } //virtual permet de regarder 
         bool clear() const { return remove; }         // les points de vies
 
-        virtual int get_hit_points() const { return 1; };
+        virtual int get_hit_points() const { return 1; }
 
     protected:
         BrickType t; // type de brick parmis les 3
@@ -55,7 +55,7 @@ class Rainbow_brick : public Brick
     public :
         Rainbow_brick(double x, double y, double c, int h);
         int check_specific() const override;
-        void hit() override; // (rendu 3)surcharge pour decrementer les vies 
+        void hit() override; // surcharge pour decrementer les vies 
                             // avant de la detruire
         int get_hit_points() const override { return hit_points; }
     private : 
