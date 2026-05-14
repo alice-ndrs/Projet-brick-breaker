@@ -3,7 +3,6 @@
 
 #include "Constants.h"
 #include "tools.h"
-#include "Paddle.h"
 
 class Brick;
 class Paddle;
@@ -41,9 +40,10 @@ class Ball
 
         void reset(const Paddle& p);  // repositionnement de la ball si lives>0
         void inactive() { active=false; }// desactive la Ball
-        bool clear() {return !active; } // indique si la Ball est conservée
+        bool clear() const {return !active; } // indique si la Ball est conservée
 
         void set_position(double x, double y) { circle.center.x = x; circle.center.y = y; }
+        void clamp_delta();
 
     private:
         Circle circle;

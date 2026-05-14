@@ -1,9 +1,6 @@
 #include "tools.h"
 #include <cmath>
 #include <algorithm>
-#include "Constants.h"
-
-extern const Cairo::RefPtr<Cairo::Context>* ptcr;
 
 // ------- Surcharges d'opérateurs pour les points -------
 

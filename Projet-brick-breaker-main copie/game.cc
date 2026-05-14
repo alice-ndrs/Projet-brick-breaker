@@ -117,7 +117,7 @@ bool Game::getLevel(const string& filename) // méthode de lecture de fichier
             reset();
             return false;
         }
-        update_status(); // hmm can be shit
+        set_initial_status();
         cout << message::success();
         return true;
     }
@@ -164,28 +164,48 @@ void Game::update()
     if (status != Status::ONGOING) return;
 
     update_balls();
-    add_pending_objects();
     nettoyer_objets();
-
+    add_pending_objects();
     update_status();
 }
 
-void Game::update_status() // version PROVISOIRE, 100% SUPPRIMABLE
+void Game::update_status()
 {
     if (status != Status::ONGOING) return;
     
-    if (bricks.empty()) {
+    if (bricks.empty()) 
+    {
         score += score_per_life * lives;
         status = Status :: WON;
         cout << message :: won();
         return;
     }
 
-    if (balls.empty() && lives == 0) {
+    if (balls.empty() && lives == 0) 
+    {
         status = Status :: LOST;
         cout << message :: lost();
         return;
     }
+}
+
+void Game::set_initial_status()
+{
+    if (bricks.empty()) 
+    {
+        status = Status::WON;
+        cout << message::won();
+        return;
+    }
+
+    if (balls.empty() && lives == 0) 
+    {
+        status = Status::LOST;
+        cout << message::lost();
+        return;
+    }
+
+    status = Status::ONGOING;
 }
 
 void Game::update_paddle(double target_x)

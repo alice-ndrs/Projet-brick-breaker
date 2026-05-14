@@ -52,11 +52,12 @@ My_window::My_window(string file_name)
     set_drawing();
 
     update_infos();
+    update_buttons();
 
-    buttons[SAVE].set_sensitive(false);
-    buttons[START].set_sensitive(false);
-    buttons[STEP].set_sensitive(false);
-    buttons[RESTART].set_sensitive(false);
+    // buttons[SAVE].set_sensitive(false);
+    // buttons[START].set_sensitive(false);
+    // buttons[STEP].set_sensitive(false);
+    // buttons[RESTART].set_sensitive(false);
 
     if (!file_name.empty())
     {
@@ -139,27 +140,29 @@ void My_window::restart_clicked()
     loop_conn.disconnect();
     loop_activated = false;
     buttons[START].set_label("start");
-    
+
     if (!last_file.empty())
     {
         if (m_game.getLevel(last_file))
         {
             level_loaded = true;
             init_x = m_game.get_paddle().getX();
+            update_buttons();
 
-            buttons[SAVE].set_sensitive(true);
-            buttons[START].set_label("start");
-            buttons[START].set_sensitive(true);
-            buttons[STEP].set_sensitive(true);
+            // buttons[SAVE].set_sensitive(true);
+            // buttons[START].set_label("start");
+            // buttons[START].set_sensitive(true);
+            // buttons[STEP].set_sensitive(true);
         }
         else
         {
             m_game.reset();
             level_loaded = false;
+            update_buttons();
 
-            buttons[SAVE].set_sensitive(false);
-            buttons[START].set_sensitive(false);
-            buttons[STEP].set_sensitive(false);
+            // buttons[SAVE].set_sensitive(false);
+            // buttons[START].set_sensitive(false);
+            // buttons[STEP].set_sensitive(false);
         }
         update_infos();
         drawing.queue_draw();
@@ -169,6 +172,8 @@ void My_window::restart_clicked()
 
 void My_window::start_clicked()
 {
+    if (m_game.get_status() != Status::ONGOING) return;
+    
     if (loop_activated)
     {
         loop_conn.disconnect();
@@ -323,20 +328,22 @@ void My_window::open_file(const std::filesystem::path& file_name)
     {
         level_loaded = true;
         init_x = m_game.get_paddle().getX();
+        update_buttons();
 
-        buttons[SAVE].set_sensitive(true);
-        buttons[START].set_sensitive(true);
-        buttons[STEP].set_sensitive(true);
+        // buttons[SAVE].set_sensitive(true);
+        // buttons[START].set_sensitive(true);
+        // buttons[STEP].set_sensitive(true);
     }
     else
     {
         m_game.reset();
         level_loaded = false;
+        update_buttons();
 
-        buttons[SAVE].set_sensitive(false);
-        buttons[START].set_sensitive(false);
-        buttons[STEP].set_sensitive(false);
-        buttons[RESTART].set_sensitive(true);
+        // buttons[SAVE].set_sensitive(false);
+        // buttons[START].set_sensitive(false);
+        // buttons[STEP].set_sensitive(false);
+        // buttons[RESTART].set_sensitive(true);
     }
 
     update_infos();
@@ -399,6 +406,17 @@ void My_window::update_infos()
     info_value[1].set_text(to_string(m_game.get_lives()));
     info_value[2].set_text(to_string(m_game.get_bricks().size()));
     info_value[3].set_text(to_string(m_game.get_balls().size()));
+}
+
+void My_window::update_buttons()
+{
+    bool ongoing = m_game.get_status() == Status::ONGOING;
+
+    buttons[SAVE].set_sensitive(true);
+    buttons[RESTART].set_sensitive(true);
+    buttons[START].set_sensitive(ongoing);
+    buttons[STEP].set_sensitive(ongoing);
+    buttons[START].set_label("start");
 }
 
 

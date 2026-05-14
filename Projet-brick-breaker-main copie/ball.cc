@@ -3,6 +3,7 @@
 #include "Brick.h"
 #include "Message.h"
 #include "Ball.h"
+#include "Paddle.h"
 
 using namespace std;
 
@@ -74,6 +75,17 @@ void Ball::set_delta(double new_dx, double new_dy)
 {
     dx = new_dx;
     dy = new_dy;
+    clamp_delta();
+}
+
+void Ball::clamp_delta()
+{
+    double norm = sqrt(dx * dx + dy * dy);
+    if (norm > delta_norm_max)
+    {
+        dx *= delta_norm_max / norm;
+        dy *= delta_norm_max / norm;
+    }
 }
 
 
