@@ -79,7 +79,7 @@ private:
     void update_balls();
 
     void process_ball_brick_collision(Ball& ball, const Brick& brick);
-    void handle_brick_hit(Ball& ball, Brick& brick);
+    void handle_brick_hit(const Point& incident_delta, Brick& brick);
     void add_pending_objects();
 
     int lives;

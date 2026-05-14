@@ -545,8 +545,10 @@ bool Game::ball_hits_brick(Ball& ball)
 
         if (ball.collision_brick(*brick,false))
         {
+            Point incident_delta = {ball.getDx(), ball.getDy()};
+            
             process_ball_brick_collision(ball, *brick);
-            handle_brick_hit(ball, *brick);
+            handle_brick_hit(incident_delta, *brick);
 
             score += score_per_hit;
 
@@ -589,7 +591,7 @@ void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
     ball.move();
 }
 
-void Game::handle_brick_hit(Ball& ball, Brick& brick)
+void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
 {
     BrickType type = brick.getType();
     double x = brick.getX();
@@ -614,7 +616,7 @@ void Game::handle_brick_hit(Ball& ball, Brick& brick)
     {
         auto new_ball = std::make_unique<Ball>();
         new_ball->set_position(x, y);
-        new_ball->set_delta(ball.getDx(), ball.getDy());
+        new_ball->set_delta(incident_delta.x, incident_delta.y);
 
         pending_balls.push_back(std::move(new_ball));
     }
