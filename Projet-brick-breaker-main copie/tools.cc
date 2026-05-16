@@ -1,9 +1,6 @@
 #include "tools.h"
 #include <cmath>
 #include <algorithm>
-#include "Constants.h"
-
-extern const Cairo::RefPtr<Cairo::Context>* ptcr;
 
 // ------- Surcharges d'opérateurs pour les points -------
 
@@ -38,7 +35,7 @@ double squared_norm(const Point& p)
 // collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2,bool epsil)
 {
-    double tol = epsil? 0:epsil_zero;
+    double tol = epsil? epsil_zero : 0.0;
     
     Point d = c1.center - c2.center;
     double radius_sum = c1.r + c2.r + tol;
@@ -72,13 +69,13 @@ bool circle_intersects_square(const Circle& c, const Square& s,bool epsil)
     Point d = c.center - Point{closestX, closestY};
     double dist = sqrt(squared_norm(d));
     
-    double tol = epsil? 0:epsil_zero;
+    double tol = epsil? epsil_zero : 0.0;
 
     return (dist - c.r) < tol;
 }
 
 // collision carre contre cercle
-bool square_intersects_circle(const Square& s, const Circle& c)
+bool square_intersects_circle(const Square& s, const Circle& c, bool epsil)
 {
-    return circle_intersects_square(c, s);
+    return circle_intersects_square(c, s, epsil);
 }

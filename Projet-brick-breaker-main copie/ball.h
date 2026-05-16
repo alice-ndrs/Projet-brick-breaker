@@ -3,7 +3,6 @@
 
 #include "Constants.h"
 #include "tools.h"
-#include "Paddle.h"
 
 class Brick;
 class Paddle;
@@ -18,9 +17,9 @@ class Ball
         int check_ball () const;
 
         // --- Détection de collisions ---
-        bool collision_ball (const Ball& other,bool epsil=true) const;
-        bool collision_brick (const Brick& b,bool epsil=true) const;
-        bool collision_paddle (const Paddle& p,bool epsil=true) const;
+        bool collision_ball (const Ball& other,bool epsil=false) const;
+        bool collision_brick (const Brick& b,bool epsil=false) const;
+        bool collision_paddle (const Paddle& p,bool epsil=false) const;
         bool lost() const;
         bool hits_vertical_wall() const;
         bool hits_top_wall() const;
@@ -41,7 +40,7 @@ class Ball
 
         void reset(const Paddle& p);  // repositionnement de la ball si lives>0
         void inactive() { active=false; }// desactive la Ball
-        bool clear() {return !active; } // indique si la Ball est conservée
+        bool clear() const {return !active; } // indique si la Ball est conservée
 
         void set_position(double x, double y) { circle.center.x = x; circle.center.y = y; }
 
@@ -49,6 +48,7 @@ class Ball
         Circle circle;
         double dx=0.0,dy=0.0;// vecteur deplacement
         bool active;    // indique si la Ball est active ou pas
+        void clamp_delta();
 };
 
 #endif

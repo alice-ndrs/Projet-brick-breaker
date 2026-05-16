@@ -7,7 +7,7 @@ class Paddle {
     public:
         Paddle (double x = 0,double y = 0, double r = 0); // constructeur par défaut
 
-        int check_paddle(bool print_error=true, bool epsil=true) const;
+        int check_paddle(bool print_error = true, bool epsil = false) const;
 
         // --- Accesseurs ---
         double getX() const { return circle.center.x; }

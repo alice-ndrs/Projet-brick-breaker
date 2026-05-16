@@ -14,9 +14,8 @@ public:
     using Gtk::Window::Window;
     My_window(std::string file_name);
 
-    double init_x=0;
-
 private:
+    double init_x=0;
     Game m_game;
     std::string last_file;
     bool level_loaded = false;
@@ -51,6 +50,7 @@ private:
 
     void set_infos();
     void update_infos();
+    void update_buttons();
 
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);

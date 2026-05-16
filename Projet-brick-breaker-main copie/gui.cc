@@ -52,23 +52,15 @@ My_window::My_window(string file_name)
     set_drawing();
 
     update_infos();
-
-    buttons[SAVE].set_sensitive(false);
-    buttons[START].set_sensitive(false);
-    buttons[STEP].set_sensitive(false);
-    buttons[RESTART].set_sensitive(false);
+    update_buttons();
 
     if (!file_name.empty())
     {
-        if (m_game.getLevel(file_name))
+        if (m_game.get_level(file_name))
         {
             level_loaded = true;
             init_x = m_game.get_paddle().getX();
-
-            buttons[SAVE].set_sensitive(true);
-            buttons[START].set_sensitive(true);
-            buttons[STEP].set_sensitive(true);
-            buttons[RESTART].set_sensitive(true);
+            update_buttons();
 
             drawing.queue_draw();
         }
@@ -76,11 +68,7 @@ My_window::My_window(string file_name)
         {
             m_game.reset();
             level_loaded = false;
-
-            buttons[SAVE].set_sensitive(false);
-            buttons[START].set_sensitive(false);
-            buttons[STEP].set_sensitive(false);
-
+            update_buttons();
 
             drawing.queue_draw();
         }
@@ -139,27 +127,20 @@ void My_window::restart_clicked()
     loop_conn.disconnect();
     loop_activated = false;
     buttons[START].set_label("start");
-    
+
     if (!last_file.empty())
     {
-        if (m_game.getLevel(last_file))
+        if (m_game.get_level(last_file))
         {
             level_loaded = true;
             init_x = m_game.get_paddle().getX();
-
-            buttons[SAVE].set_sensitive(true);
-            buttons[START].set_label("start");
-            buttons[START].set_sensitive(true);
-            buttons[STEP].set_sensitive(true);
+            update_buttons();
         }
         else
         {
             m_game.reset();
             level_loaded = false;
-
-            buttons[SAVE].set_sensitive(false);
-            buttons[START].set_sensitive(false);
-            buttons[STEP].set_sensitive(false);
+            update_buttons();
         }
         update_infos();
         drawing.queue_draw();
@@ -169,6 +150,9 @@ void My_window::restart_clicked()
 
 void My_window::start_clicked()
 {
+    if (!level_loaded) return;
+    if (m_game.get_status() != Status::ONGOING) return;
+
     if (loop_activated)
     {
         loop_conn.disconnect();
@@ -198,10 +182,11 @@ void My_window::start_clicked()
 void My_window::step_clicked()
 {
     if (!level_loaded) return;
+    if (m_game.get_status() != Status::ONGOING) return;
 
     m_game.update_paddle(init_x);
     m_game.update();
-    update_infos(); // On met à jour l'affichage
+    update_infos();
     drawing.queue_draw();
 }
 
@@ -319,24 +304,17 @@ void My_window::open_file(const std::filesystem::path& file_name)
     loop_activated = false;
     buttons[START].set_label("start");
 
-    if (m_game.getLevel(file_name.string()))
+    if (m_game.get_level(file_name.string()))
     {
         level_loaded = true;
         init_x = m_game.get_paddle().getX();
-
-        buttons[SAVE].set_sensitive(true);
-        buttons[START].set_sensitive(true);
-        buttons[STEP].set_sensitive(true);
+        update_buttons();
     }
     else
     {
         m_game.reset();
         level_loaded = false;
-
-        buttons[SAVE].set_sensitive(false);
-        buttons[START].set_sensitive(false);
-        buttons[STEP].set_sensitive(false);
-        buttons[RESTART].set_sensitive(true);
+        update_buttons();
     }
 
     update_infos();
@@ -344,9 +322,8 @@ void My_window::open_file(const std::filesystem::path& file_name)
 }
 
 void My_window::save_file(const std::filesystem::path& file_name) 
-{
-    cout << "save file " << file_name << endl; 
-    m_game.saveLevel(file_name.string());
+{ 
+    m_game.save_level(file_name.string());
 }
 
 bool My_window::loop()
@@ -361,10 +338,8 @@ bool My_window::loop()
             loop_activated = false;
             buttons[EXIT].set_sensitive(true);
             buttons[OPEN].set_sensitive(true);
-            buttons[SAVE].set_sensitive(true);
-            buttons[RESTART].set_sensitive(true);
-            buttons[START].set_sensitive(false);
-            buttons[STEP].set_sensitive(false);
+            update_buttons();
+
             return false;
         }
         return true;
@@ -401,6 +376,26 @@ void My_window::update_infos()
     info_value[3].set_text(to_string(m_game.get_balls().size()));
 }
 
+void My_window::update_buttons()
+{
+    buttons[START].set_label("start");
+    
+    if (!level_loaded) 
+    {
+        buttons[SAVE].set_sensitive(false);
+        buttons[START].set_sensitive(false);
+        buttons[STEP].set_sensitive(false);
+        buttons[RESTART].set_sensitive(false);
+        return;
+    }
+
+    bool ongoing = m_game.get_status() == Status::ONGOING;
+    buttons[SAVE].set_sensitive(true);
+    buttons[RESTART].set_sensitive(true);
+    buttons[START].set_sensitive(ongoing);
+    buttons[STEP].set_sensitive(ongoing);
+}
+
 
 void My_window::set_drawing()
 {
@@ -413,7 +408,6 @@ void My_window::set_drawing()
 
 void draw_split_square(Square sq,int niveau)
 {
-    
     Color color[3] = {ORANGE, YELLOW, GREEN};
     if (niveau > 2) {return;}
     if (sq.side < brick_size_min*2) {return;}
@@ -438,7 +432,6 @@ void draw_split_square(Square sq,int niveau)
         draw_square (sq_prime);
         draw_split_square (sq_prime, niveau+ 1);
     }
-
 }
 
 

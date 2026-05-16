@@ -1,11 +1,14 @@
-#ifndef Game_H
-#define Game_H
-#include <vector>
+#ifndef GAME_H
+#define GAME_H
+
 #include <memory>
+#include <sstream>
+#include <vector>
+
 #include "Ball.h"
 #include "Brick.h"  
 #include "Paddle.h"
-#include <sstream>
+
 
 enum Status {
     ONGOING,
@@ -30,28 +33,35 @@ class Game
 {
 public:
     Game (int lives = 0,int score = 0);
-    virtual ~Game()=default;
+    virtual ~Game() = default;
 
-    bool getLevel (const std::string& filename); // déclaration de la 
-                                                    //fin de lecture de fichier
-    bool saveLevel (const std:: string& filename);
-    // --- Gestion des collisions ---
-    int check_collisions () const;              
-    bool collision_bricks() const;
-    bool collision_balls() const;
-    bool collision_ball_brick() const;
-    bool collision_ball_paddle() const;
-    bool collision_brick_paddle() const;
-    bool ball_hits_brick(Ball& b);
-    bool ball_hits_paddle(Ball& b);
-    bool ball_hits_ball(Ball& b);
+    bool get_level (const std::string& filename);
+    bool save_level (const std::string& filename);
 
-    void reset();  // reinitialise l'etat du jeu
-    void nettoyer_objets();
-    bool decodage_ligne(std::istringstream& data);
+    void reset();
+    void update();
+    void update_paddle(double target_x);
     void create_new_ball();
 
-    // --- Méthodes de décodage spécifiques ---
+    const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
+    const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
+    
+    const Paddle& get_paddle() const { return paddle; }
+
+    int get_score() const {return score;}
+    int get_lives() const {return lives;}
+    Status get_status () const {return status;}
+    
+private:
+    // --- Méthodes de gestion du jeu ---
+    void update_status();
+    void set_initial_status();
+    void update_balls();
+    void add_pending_objects();
+    void nettoyer_objets();
+
+    // --- Méthodes de décodage ---
+    bool decodage_ligne(std::istringstream& data);
     bool decodage_score(std::istringstream& data);
     bool decodage_lives(std::istringstream& data);
     bool decodage_paddle(std::istringstream& data);
@@ -59,37 +69,31 @@ public:
     bool decodage_brick(std::istringstream& data);
     bool decodage_nb_balls(std::istringstream& data);
     bool decodage_ball(std::istringstream& data);
+    bool is_line_empty(std::istringstream& data);
 
-
-    bool is_line_empty(std::istringstream& data);//verifie la ligne lue est
-                                        //vide ou ne contient que des espaces
-    
-    const std::vector<std::unique_ptr<Brick>>& get_bricks() const { return bricks; }
-    const std::vector<std::unique_ptr<Ball>>&  get_balls()  const { return balls;  }
-    Paddle& get_paddle() { return paddle; }
-    int get_score() {return score;}
-    int get_lives() {return lives;}
-    Status get_status () {return status;}
-
-    void update();
-    void update_paddle(double target_x);
-
-private:
-    void update_status();
-    void update_balls();
+    // --- Gestion des collisions ---
+    int check_collisions () const;              
+    bool collision_bricks() const;
+    bool collision_balls() const;
+    bool collision_ball_brick() const;
+    bool collision_ball_paddle() const;
+    bool collision_brick_paddle() const;
+    // --- Gestion des rebonds ---
+    bool ball_hits_brick(Ball& b);
+    bool ball_hits_paddle(Ball& b);
+    bool ball_hits_ball(Ball& b);
 
     void process_ball_brick_collision(Ball& ball, const Brick& brick);
-    void handle_brick_hit(Ball& ball, Brick& brick);
-    void add_pending_objects();
+    void handle_brick_hit(const Point& incident_delta, Brick& brick);
 
     int lives;
     int score;
 
-    std::vector<std::unique_ptr<Ball>> pending_balls;
-    std::vector<std::unique_ptr<Brick>> pending_bricks;
     std::vector<std::unique_ptr<Brick>> bricks;
     std::vector<std::unique_ptr<Ball>> balls;
-
+    std::vector<std::unique_ptr<Ball>> pending_balls;
+    std::vector<std::unique_ptr<Brick>> pending_bricks;
+    
     Paddle paddle;
 
     Status status;
