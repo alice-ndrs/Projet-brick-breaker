@@ -30,7 +30,7 @@ int Paddle::check_paddle(bool print_error, bool epsil) const
     if (circle.center.y + circle.r <= 0) { 
         if(print_error){
             cout << message::paddle_outside(circle.center.x, circle.center.y);
-        };
+        }
         return 1;
     }
 

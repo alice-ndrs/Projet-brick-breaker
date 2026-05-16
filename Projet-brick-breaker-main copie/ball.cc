@@ -19,7 +19,7 @@ int Ball::check_ball () const   //verifie si Ball est dans l'arene et
     bool outside_x = (circle.center.x - circle.r < 0) 
                     || (circle.center.x + circle.r > arena_size);
 
-    bool outside_y = (circle.center.y < 0) 
+    bool outside_y = (circle.center.y - circle.r < 0) 
                     || (circle.center.y + circle.r > arena_size);
               
     if (outside_x || outside_y){
