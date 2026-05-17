@@ -98,6 +98,8 @@ std::vector<std::unique_ptr<Brick>> Split_brick::split() const
 {
     std::vector<std::unique_ptr<Brick>> new_bricks;
     double s=(square.side-split_brick_gap)/2; 
+
+    if (s < brick_size_min) return new_bricks; 
     
     double o = (split_brick_gap / 2) + (s/2);
     double cx = square.center.x;
