@@ -76,6 +76,7 @@ bool Brick::collision_paddle (const Paddle& p, bool epsil) const //superposition
     return square_intersects_circle(square, p.getCircle(), epsil);
 }
 
+// --- Fonction de Jeu ---
 
 void Rainbow_brick::hit() {
     if (hit_points > 0) {// on decremente si la Brick a encore des hits points

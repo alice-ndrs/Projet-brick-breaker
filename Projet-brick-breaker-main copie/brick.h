@@ -39,6 +39,7 @@ public:
     const Square& getSquare() const { return square; }
     BrickType getType() const { return t; }
 
+    // --- Fonction de Jeu ---
     virtual void hit () { remove = true; } //virtual permet de regarder 
     bool clear() const { return remove; }         // les points de vies
 

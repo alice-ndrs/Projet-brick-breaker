@@ -57,10 +57,13 @@ bool Ball::collision_paddle (const Paddle& paddle,bool epsil) const //superposit
     return circle_intersects_circle(circle, paddle.getCircle(),epsil);
 }
 
+// --- Methode du Jeu ---
+
 bool Ball::lost() const 
 {
     return circle.center.y < 0;
 }
+
 
 bool Ball::hits_vertical_wall() const 
 {
@@ -73,12 +76,14 @@ bool Ball::hits_top_wall() const
     return circle.center.y + circle.r > arena_size - epsil_zero;
 }
 
+
 void Ball::set_delta(double new_dx, double new_dy)
 {
     dx = new_dx;
     dy = new_dy;
     clamp_delta();
 }
+
 
 void Ball::clamp_delta()
 {
@@ -91,18 +96,19 @@ void Ball::clamp_delta()
 }
 
 
-
 void Ball::move()
 {
     circle.center.x += dx;
     circle.center.y += dy;
 }
 
+
 void Ball::undo_move()
 {
     circle.center.x -= dx;
     circle.center.y -= dy;
 }
+
 
 void Ball::reset(const Paddle& p) //replace la Ball sur le Paddle
 { 

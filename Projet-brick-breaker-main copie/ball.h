@@ -36,6 +36,7 @@ public:
     double getDy()const { return dy; }
     const Circle& getCircle() const { return circle; }
 
+    // --- Fonction de Jeu ---
     void move();
     void undo_move();
 

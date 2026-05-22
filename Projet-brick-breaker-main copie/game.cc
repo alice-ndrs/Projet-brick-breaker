@@ -16,13 +16,14 @@ Game::Game (int lives,int score)
     status(Status::ONGOING), etat(SCORE), total(0), count(0)
 {}
 
+//------------- Gestion du jeu -------------
 //reinitialise l'etat du jeu
 void Game::reset() 
 {
     etat = SCORE;
     total = 0;
     count = 0;
-    lives = 0;
+    lives = 0; 
     score = 0;
     bricks.clear();
     balls.clear();
@@ -31,6 +32,7 @@ void Game::reset()
     paddle = Paddle();
     status = Status::ONGOING;
 }
+
 
 void Game::nettoyer_objets()
 {
@@ -205,6 +207,15 @@ void Game::set_initial_status()
 
     status = Status::ONGOING;
 }
+
+
+bool Game::is_line_empty(istringstream& data)
+{
+    data >> ws;               // White space: on evite les espaces 
+    return data.eof();      //return false si il rest du text
+}
+
+//------------- Mise a jour des Modules Game -------------
 
 void Game::update_paddle(double target_x)
 {
@@ -660,8 +671,6 @@ void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
 }
 
 
-
-
 bool Game::ball_hits_paddle(Ball& ball)
 {
     if (ball.collision_paddle(paddle, true))
@@ -759,11 +768,4 @@ bool Game::ball_hits_ball(Ball& ball)
         }
     }
     return false;
-}
-
-
-bool Game::is_line_empty(istringstream& data)
-{
-    data >> ws;               // White space: on evite les espaces 
-    return data.eof();      //return false si il rest du text
 }

@@ -38,10 +38,12 @@ public:
     Game& operator=(const Game&) = delete;
     Game(Game&&) = default;
     Game& operator=(Game&&) = default;
+    
 
     bool get_level (const std::string& filename);
     bool save_level (const std::string& filename);
 
+    //------ Méthodes de gestion du jeu ------
     void reset();
     void update();
     void update_paddle(double target_x);
