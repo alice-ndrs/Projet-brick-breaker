@@ -452,7 +452,7 @@ void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
     draw_balls(cr);
 }
 
-void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr) 
+void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr) const
 {
     set_color(BLACK);
     draw_arc(m_game.get_paddle().getCircle());
@@ -460,7 +460,7 @@ void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->stroke();
 }
 
-void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr) 
+void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr) const
 {
     for (const auto& brick : m_game.get_bricks())
     {
@@ -505,7 +505,7 @@ void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 }
 
-void My_window::draw_balls(const Cairo::RefPtr<Cairo::Context>& cr) 
+void My_window::draw_balls(const Cairo::RefPtr<Cairo::Context>& cr) const
 {
     set_color(BLACK);
     for (const auto& ball : m_game.get_balls())

@@ -54,9 +54,9 @@ private:
 
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
-    void draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr);
-    void draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr);
-    void draw_balls(const Cairo::RefPtr<Cairo::Context>& cr);
+    void draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr)const;
+    void draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)const;
+    void draw_balls(const Cairo::RefPtr<Cairo::Context>& cr)const;
 
     void set_mouse_controller();
     void on_drawing_left_click(int n_press, double x, double y);
