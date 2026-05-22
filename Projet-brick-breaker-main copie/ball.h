@@ -11,7 +11,7 @@ class Ball
 {
 public:
     Ball (double x=0,double y=0,double r=new_ball_radius,double dx=0,double dy=0);
-    virtual ~Ball() = default; // destructeur virtuel par défaut
+    ~Ball() = default; // destructeur virtuel par défaut
     Ball(const Ball&) = default; // constructeur de copie par défaut
     Ball& operator=(const Ball&) = default; // opérateur d'affectation par défaut
 
