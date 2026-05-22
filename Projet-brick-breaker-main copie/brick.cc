@@ -27,16 +27,17 @@ Rainbow_brick::Rainbow_brick(double x, double y, double c, int h)
 
 int Brick::check_brick() const
 { 
-    int type_value = static_cast<int>(t); 
+    const int type_value = static_cast<int>(t); 
+
     if (type_value < 0 || type_value > 2) { // verifie le type
         cout << message::invalid_brick_type(type_value);
         return 1;
     }
     
-    bool outside_x = (square.center.x - square.side/2 < 0) 
+    const bool outside_x = (square.center.x - square.side/2 < 0) 
                     || (square.center.x + square.side/2 > arena_size);
 
-    bool outside_y = (square.center.y - square.side/2 < 0) 
+    const bool outside_y = (square.center.y - square.side/2 < 0) 
                     || (square.center.y + square.side/2 > arena_size);
 
     if (outside_x || outside_y) { //verifie si Ball est dans l'arene
@@ -97,13 +98,13 @@ void Split_brick::hit()
 std::vector<std::unique_ptr<Brick>> Split_brick::split() const
 {
     std::vector<std::unique_ptr<Brick>> new_bricks;
-    double s=(square.side-split_brick_gap)/2; 
+    const double s=(square.side-split_brick_gap)/2; 
 
     if (s < brick_size_min) return new_bricks; 
     
-    double o = (split_brick_gap / 2) + (s/2);
-    double cx = square.center.x;
-    double cy = square.center.y;
+    const double o = (split_brick_gap / 2) + (s/2);
+    const double cx = square.center.x;
+    const double cy = square.center.y;
 
     double positions[4][2] = {
         {cx - o, cy - o},

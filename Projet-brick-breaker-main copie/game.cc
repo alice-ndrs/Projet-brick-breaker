@@ -208,8 +208,8 @@ void Game::set_initial_status()
 
 void Game::update_paddle(double target_x)
 {
-    double old_x = paddle.getX();
-    double diff = target_x - old_x;
+    const double old_x = paddle.getX();
+    const double diff = target_x - old_x;
     double new_x = old_x;
 
     if (std::abs(diff) <= delta_norm_max)
@@ -251,6 +251,8 @@ void Game::update_balls()
 {
     for (auto& ball : balls)
     {
+        Point initial_position = ball->get_position();
+        
         ball->move();
         if (ball->lost()) {
             ball->inactive();
@@ -287,7 +289,9 @@ void Game::update_balls()
                 break;
             }
         }
-        if (nb_bounce >= nb_bounce_max) {ball->undo_move();}
+        if (nb_bounce >= nb_bounce_max && !ball->clear()) {
+            ball->set_position(initial_position);
+        }
     }
 }
 
@@ -394,7 +398,7 @@ bool Game::decodage_nb_bricks(istringstream& data)
 
 bool Game::decodage_brick(istringstream& data) 
 {
-    int t;      // type
+    int t; // type
     double x, y, c; // position et cote
 
     if (!(data >> t >> x >> y >> c)) return false;
@@ -404,21 +408,24 @@ bool Game::decodage_brick(istringstream& data)
             int h;
             if (!(data >> h)) return false;
             if (!is_line_empty(data)) return false;
-            std::unique_ptr<Rainbow_brick> b(new Rainbow_brick(x, y, c, h));
+            auto b = std::make_unique<Rainbow_brick>(x, y, c, h);
+            // std::unique_ptr<Rainbow_brick> b(new Rainbow_brick(x, y, c, h));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
         case 1: {
             if (!is_line_empty(data)) return false;
-            std::unique_ptr<Ball_brick> b(new Ball_brick(x, y, c));
+            auto b = std::make_unique<Ball_brick>(x, y, c);
+            // std::unique_ptr<Ball_brick> b(new Ball_brick(x, y, c));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
         }
         case 2: {
             if (!is_line_empty(data)) return false;
-            std::unique_ptr<Split_brick> b(new Split_brick(x, y, c));
+            auto b = std::make_unique<Split_brick>(x, y, c);
+            // std::unique_ptr<Split_brick> b(new Split_brick(x, y, c));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
@@ -464,7 +471,8 @@ bool Game::decodage_ball(istringstream& data)
     if (!(data >> xBall >> yBall >> rBall >> dx >> dy)) return false;
     if (!is_line_empty(data)) return false;
 
-    std::unique_ptr<Ball> b(new Ball(xBall, yBall, rBall, dx, dy));
+    auto b = std::make_unique<Ball>(xBall, yBall, rBall, dx, dy);
+    // std::unique_ptr<Ball> b(new Ball(xBall, yBall, rBall, dx, dy));
     if (b->check_ball()) {
         return false;
     }
@@ -578,42 +586,47 @@ bool Game::ball_hits_brick(Ball& ball)
 
 void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
 {
-    Point difference = ball.getCircle().center - brick.getSquare().center;
-    double half = brick.getC() / 2.0;
+    const Point difference = ball.getCircle().center - brick.getSquare().center;
+    const double half = brick.getC() / 2.0;
 
-    Point bounded = { // pt du carré le + proche du centre de la balle
+    const Point bounded = { // pt du carré le + proche du centre de la balle
         std::max(-half, std::min(difference.x, half)),
         std::max(-half, std::min(difference.y, half))
     };
 
-    Point normal = difference - bounded;// direction nominale/normale du choc
-    double normal_squared_norm = squared_norm(normal);
+    const Point normal = difference - bounded;// direction nominale/normale du choc
+    const double normal_squared_norm = squared_norm(normal);
+    const double epsil_squared = epsil_zero * epsil_zero;
 
     ball.undo_move();
 
-    if (normal_squared_norm > 0)
+    if (normal_squared_norm > epsil_squared)
     {
-        Point v = {ball.getDx(), ball.getDy()};
+        const Point v = {ball.getDx(), ball.getDy()};
 
-        Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
-        Point new_v = v - 2.0 * vn; // on inverse que la normale
+        const Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
+        const Point new_v = v - 2.0 * vn; // on inverse que la normale
 
         ball.set_delta(new_v.x, new_v.y);
     }
     else
     {
         // pour éviter "effet tunnel"
-        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) { ball.reverse_dx(); }
-        else { ball.reverse_dy(); }
+        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) { 
+            ball.reverse_dx(); 
+        }
+        else { 
+            ball.reverse_dy(); 
+        }
     }
     ball.move();
 }
 
 void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
 {
-    BrickType type = brick.getType();
-    double x = brick.getX();
-    double y = brick.getY();
+    const BrickType type = brick.getType();
+    const double x = brick.getX();
+    const double y = brick.getY();
 
     std::vector<std::unique_ptr<Brick>> new_bricks;
 
@@ -633,7 +646,7 @@ void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
     if (type == BrickType::BALL)
     {
         auto new_ball = std::make_unique<Ball>();
-        new_ball->set_position(x, y);
+        new_ball->set_position({ x, y });
         new_ball->set_delta(incident_delta.x, incident_delta.y);
 
         pending_balls.push_back(std::move(new_ball));
@@ -654,20 +667,20 @@ bool Game::ball_hits_paddle(Ball& ball)
     if (ball.collision_paddle(paddle, true))
     {
         // direction nominale balle → paddle (cercle contre cercle)
-        Point diff = ball.getCircle().center - paddle.getCircle().center;
-        double dist = squared_norm(diff);
+        const Point diff = ball.getCircle().center - paddle.getCircle().center;
+        const double dist = squared_norm(diff);
+        const double epsil_squared = epsil_zero * epsil_zero;
 
         ball.undo_move();
 
-        if (dist > 0)
+        if (dist > epsil_squared)
         {
-            Point v= {ball.getDx(), ball.getDy()};
-            Point v_p= {paddle.getX() - paddle.getPrevX(), 0.0};
+            const Point v= {ball.getDx(), ball.getDy()};
+            const Point v_p= {paddle.getX() - paddle.getPrevX(), 0.0};
 
-            Point vn = (dot(v, diff) / dist) * diff;
-            Point vn_other = (dot(v_p, diff) / dist) * diff;
-
-            Point impulsion = 2.0 * (vn_other - vn);
+            const Point vn = (dot(v, diff) / dist) * diff;
+            const Point vn_other = (dot(v_p, diff) / dist) * diff;
+            const Point impulsion = 2.0 * (vn_other - vn);
             Point new_v = v+impulsion;
 
             double d = sqrt(squared_norm(new_v));
@@ -699,24 +712,25 @@ bool Game::ball_hits_ball(Ball& ball)
 
         if(ball.collision_ball(*b, true)){
 
-            Point diff = ball.getCircle().center - b->getCircle().center;
-            double dist = squared_norm(diff);
+            const Point diff = ball.getCircle().center - b->getCircle().center;
+            const double dist = squared_norm(diff);
+            const double epsil_squared = epsil_zero * epsil_zero;
 
             ball.undo_move();
 
-            if (dist > 0)
+            if (dist > epsil_squared)
             {
-                Point v= {ball.getDx(), ball.getDy()};
-                Point v_b= {b->getDx(),b->getDy()};
+                const Point v= {ball.getDx(), ball.getDy()};
+                const Point v_b= {b->getDx(),b->getDy()};
 
-                double vn = dot(v, diff) / dist;
-                double vn_other = dot(v_b, diff) / dist;
+                const double vn = dot(v, diff) / dist;
+                const double vn_other = dot(v_b, diff) / dist;
 
-                double r_autre = b->getR() * b->getR();
-                double r = ball.getR() * ball.getR();
-                double cte = 2 * r_autre / (r+r_autre);
+                const double r_autre = b->getR() * b->getR();
+                const double r = ball.getR() * ball.getR();
+                const double cte = 2 * r_autre / (r+r_autre);
 
-                double impulsion = cte * (vn_other-vn);
+                const double impulsion = cte * (vn_other-vn);
                 Point new_v = v + impulsion * diff;
                 Point new_v_b = v_b - impulsion * (r/r_autre) * diff;
 
@@ -740,7 +754,6 @@ bool Game::ball_hits_ball(Ball& ball)
             {
                 ball.reverse_dy();
             }
-
             ball.move();
             return true;
         }

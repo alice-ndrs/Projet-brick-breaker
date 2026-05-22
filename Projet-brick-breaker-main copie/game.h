@@ -34,6 +34,10 @@ class Game
 public:
     Game (int lives = 0,int score = 0);
     virtual ~Game() = default;
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    Game(Game&&) = default;
+    Game& operator=(Game&&) = default;
 
     bool get_level (const std::string& filename);
     bool save_level (const std::string& filename);

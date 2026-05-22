@@ -1,5 +1,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
+#include "Constants.h"
 
 constexpr double epsil_zero = 0.125;
 
@@ -27,7 +28,7 @@ struct Square {
 
 
 bool circle_intersects_circle(const Circle& c1, const Circle& c2, bool epsil = false);
-bool square_intersects_square(const Square& s1, const Square& s2);
+bool square_intersects_square(const Square& s1, const Square& s2, bool epsil = false);
 bool circle_intersects_square(const Circle& c, const Square& s, bool epsil = false);
 bool square_intersects_circle(const Square& s, const Circle& c, bool epsil = false);
 

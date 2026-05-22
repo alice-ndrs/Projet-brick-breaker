@@ -233,8 +233,9 @@ void My_window::set_dialog(Gtk::FileChooserDialog *dialog)
     dialog->set_select_multiple(false);
     dialog->signal_response().connect(
         sigc::bind(sigc::mem_fun(*this, &My_window::dialog_response), dialog));
-
+    dialog->signal_hide().connect([dialog]() { delete dialog; });
     dialog->add_button("_Cancel", CANCEL);
+
     switch (dialog->get_action())
     {
     case Gtk::FileChooserDialog::Action::OPEN:
@@ -408,16 +409,16 @@ void My_window::set_drawing()
 
 void draw_split_square(Square sq,int niveau)
 {
-    Color color[3] = {ORANGE, YELLOW, GREEN};
-    if (niveau > 2) {return;}
-    if (sq.side < brick_size_min*2) {return;}
+    Color color[6] = {ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE};
+    if (niveau > 6) {return;}
+    if (sq.side < brick_size_min * 2) {return;}
 
-    double s = (sq.side-split_brick_gap) / 2;
+    const double s = (sq.side - split_brick_gap) / 2;
     if (s < brick_size_min) {return;}
 
-    double o = (split_brick_gap / 2) + (s/2);
-    double cx = sq.center.x;
-    double cy = sq.center.y;
+    const double o = (split_brick_gap / 2.0) + (s / 2.0);
+    const double cx = sq.center.x;
+    const double cy = sq.center.y;
 
     Square new_sq[4] = {
         {{cx - o, cy - o}, s},
@@ -426,11 +427,11 @@ void draw_split_square(Square sq,int niveau)
         {{cx + o, cy + o}, s}
     };
 
-    for (auto& sq_prime:new_sq)
+    for (const auto& sq_prime : new_sq)
     {
         set_color (color[niveau]);
         draw_square (sq_prime);
-        draw_split_square (sq_prime, niveau+ 1);
+        draw_split_square (sq_prime, niveau + 1);
     }
 }
 
@@ -438,7 +439,7 @@ void draw_split_square(Square sq,int niveau)
 void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height)
 {
     graphic_set_context(cr);
-    double side (min(width, height));
+    const double side (min(width, height));
     cr->translate((width - side) / 2, (height + side) / 2);
     cr->scale(side / (arena_size), -side / (arena_size));
     
@@ -543,12 +544,11 @@ void My_window::on_drawing_left_click(int n_press, double x, double y)
 
 void My_window::on_drawing_move(double x, double y)
 {
-    int width = drawing.get_width();
-    int height = drawing.get_height();
+    const int width = drawing.get_width();
+    const int height = drawing.get_height();
 
-    double side = min(width, height);
-    double offset_x = (width - side) / 2.0;
-
+    const double side = min(width, height);
+    const double offset_x = (width - side) / 2.0;
     // init_x vaut 0 en bas à gauche de l'arène, et pas de la fenêtre de dessin
     init_x = (x - offset_x) * arena_size / side;
 

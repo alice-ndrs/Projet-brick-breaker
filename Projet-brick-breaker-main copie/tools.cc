@@ -35,43 +35,44 @@ double squared_norm(const Point& p)
 // collision cercle contre cercle
 bool circle_intersects_circle(const Circle& c1, const Circle& c2,bool epsil)
 {
-    double tol = epsil? epsil_zero : 0.0;
+    const double tol = epsil? epsil_zero : 0.0;
     
-    Point d = c1.center - c2.center;
-    double radius_sum = c1.r + c2.r + tol;
+    const Point d = c1.center - c2.center;
+    const double radius_sum = c1.r + c2.r + tol;
 
     return squared_norm(d) < radius_sum * radius_sum;
 }
 
 // collision carre contre carre
-bool square_intersects_square(const Square& s1, const Square& s2)
+bool square_intersects_square(const Square& s1, const Square& s2, bool epsil)
 {
-    double dx = std::abs(s1.center.x - s2.center.x);
-    double dy = std::abs(s1.center.y - s2.center.y);
-    double limit = (s1.side + s2.side) / 2.0;
+    const double tol = epsil ? epsil_zero : 0.0;
 
-    return (dx < limit && dy < limit);
+    const double dx = std::abs(s1.center.x - s2.center.x);
+    const double dy = std::abs(s1.center.y - s2.center.y);
+    const double limit = (s1.side + s2.side) / 2.0;
+
+    return dx < limit + tol && dy < limit + tol;
 }
 
 // collision cercle contre carre
 bool circle_intersects_square(const Circle& c, const Square& s,bool epsil)
 {
-    double half = s.side / 2.0;
+    const double half = s.side / 2.0;
 
-    double left   = s.center.x - half;
-    double right  = s.center.x + half;
-    double bottom = s.center.y - half;
-    double top    = s.center.y + half;
+    const double left   = s.center.x - half;
+    const double right  = s.center.x + half;
+    const double bottom = s.center.y - half;
+    const double top    = s.center.y + half;
 
-    double closestX = std::max(left,  std::min(c.center.x, right));
-    double closestY = std::max(bottom, std::min(c.center.y, top));
+    const double closestX = std::max(left,  std::min(c.center.x, right));
+    const double closestY = std::max(bottom, std::min(c.center.y, top));
 
-    Point d = c.center - Point{closestX, closestY};
-    double dist = sqrt(squared_norm(d));
-    
-    double tol = epsil? epsil_zero : 0.0;
+    const Point d = c.center - Point{closestX, closestY};
+    const double tol = epsil? epsil_zero : 0.0;
+    const double radius = c.r + tol;
 
-    return (dist - c.r) < tol;
+    return squared_norm(d) < radius * radius;
 }
 
 // collision carre contre cercle
