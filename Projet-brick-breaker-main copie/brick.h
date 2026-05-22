@@ -23,7 +23,7 @@ public:
     Brick(BrickType t, double x, double y, double c);
     virtual ~Brick() = default;// destructeur virtuel par defaut
     Brick(const Brick&) = delete; // constructeur de copie par défaut
-    Brick& operator=(const Brick&) = delete; // opérateur d'affectation par
+    Brick& operator=(const Brick&) = delete; // opérateur d'affectation par defaut 
 
     int check_brick() const;
     virtual int check_specific() const { return 0; }

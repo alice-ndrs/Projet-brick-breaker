@@ -83,7 +83,7 @@ void Ball::set_delta(double new_dx, double new_dy)
 void Ball::clamp_delta()
 {
     const double norm = sqrt(dx * dx + dy * dy);
-    if (norm > delta_norm_max)
+    if (norm > delta_norm_max && norm > epsil_zero)
     {
         dx *= delta_norm_max / norm;
         dy *= delta_norm_max / norm;

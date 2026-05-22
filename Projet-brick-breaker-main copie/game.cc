@@ -684,7 +684,7 @@ bool Game::ball_hits_paddle(Ball& ball)
             Point new_v = v+impulsion;
 
             double d = sqrt(squared_norm(new_v));
-            if (d > delta_norm_max)
+            if (d > delta_norm_max && d > epsil_zero)
             {
                 new_v.x *= delta_norm_max / d;
                 new_v.y *= delta_norm_max / d;
@@ -735,13 +735,13 @@ bool Game::ball_hits_ball(Ball& ball)
                 Point new_v_b = v_b - impulsion * (r/r_autre) * diff;
 
                 double d = sqrt(squared_norm(new_v));
-                if (d > delta_norm_max)
+                if (d > epsil_zero && d > delta_norm_max)
                 {
                     new_v.x *= delta_norm_max / d;
                     new_v.y *= delta_norm_max / d;
                 }
                 double d_b = sqrt(squared_norm(new_v_b));
-                if (d_b > delta_norm_max)
+                if (d_b > epsil_zero && d_b > delta_norm_max)
                 {
                     new_v_b.x *= delta_norm_max / d_b;
                     new_v_b.y *= delta_norm_max / d_b;
