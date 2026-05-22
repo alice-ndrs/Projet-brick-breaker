@@ -164,7 +164,7 @@ void My_window::start_clicked()
         buttons[START].set_label("start");
         buttons[STEP].set_sensitive(true);
     }
-    else // TODO: only if the game is not finished
+    else
     {
         loop_conn =
             Glib::signal_timeout().connect(sigc::mem_fun(*this, &My_window::loop), dt);
@@ -407,7 +407,7 @@ void My_window::set_drawing()
 }
 
 
-void draw_split_square(Square sq,int niveau)
+void draw_split_square(const Square& sq, int niveau)
 {
     Color color[6] = {ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE};
     if (niveau > 6) {return;}
