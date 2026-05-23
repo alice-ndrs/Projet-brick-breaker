@@ -420,7 +420,6 @@ bool Game::decodage_brick(istringstream& data)
             if (!(data >> h)) return false;
             if (!is_line_empty(data)) return false;
             auto b = std::make_unique<Rainbow_brick>(x, y, c, h);
-            // std::unique_ptr<Rainbow_brick> b(new Rainbow_brick(x, y, c, h));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
@@ -428,7 +427,6 @@ bool Game::decodage_brick(istringstream& data)
         case 1: {
             if (!is_line_empty(data)) return false;
             auto b = std::make_unique<Ball_brick>(x, y, c);
-            // std::unique_ptr<Ball_brick> b(new Ball_brick(x, y, c));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
@@ -436,7 +434,6 @@ bool Game::decodage_brick(istringstream& data)
         case 2: {
             if (!is_line_empty(data)) return false;
             auto b = std::make_unique<Split_brick>(x, y, c);
-            // std::unique_ptr<Split_brick> b(new Split_brick(x, y, c));
             if (b->check_brick()) return false;
             bricks.push_back(std::move(b));
             break;
@@ -483,7 +480,6 @@ bool Game::decodage_ball(istringstream& data)
     if (!is_line_empty(data)) return false;
 
     auto b = std::make_unique<Ball>(xBall, yBall, rBall, dx, dy);
-    // std::unique_ptr<Ball> b(new Ball(xBall, yBall, rBall, dx, dy));
     if (b->check_ball()) {
         return false;
     }
@@ -615,14 +611,15 @@ void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
     {
         const Point v = {ball.getDx(), ball.getDy()};
 
-        const Point vn = (dot(v, normal) / normal_squared_norm) * normal; // partie de la vitesse dirigée selon la normale
+        // partie de la vitesse dirigée selon la normale
+        const Point vn = (dot(v, normal) / normal_squared_norm) * normal;
         const Point new_v = v - 2.0 * vn; // on inverse que la normale
 
         ball.set_delta(new_v.x, new_v.y);
     }
     else
     {
-        // pour éviter "effet tunnel"
+        // pour collisions haute vitesse
         if (std::abs(ball.getDx()) > std::abs(ball.getDy())) { 
             ball.reverse_dx(); 
         }

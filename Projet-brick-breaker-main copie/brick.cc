@@ -91,6 +91,7 @@ void Rainbow_brick::hit() {
 void Ball_brick::hit(){
     remove=true;
 }
+
 void Split_brick::hit()
 {
     remove = true;
