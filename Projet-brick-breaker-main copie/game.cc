@@ -95,7 +95,7 @@ bool Game::get_level(const string &filename) // méthode de lecture de fichier
             if (line.empty()) continue;
             if (line[0] == '#') continue;
 
-        istringstream data(line);
+            istringstream data(line);
 
             if (decodage_ligne(data) == false) {
                 reset();

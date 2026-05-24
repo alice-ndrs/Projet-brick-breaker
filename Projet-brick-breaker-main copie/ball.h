@@ -15,13 +15,14 @@ class Ball {
     Ball(const Ball &) = default;            // constructeur de copie par défaut
     Ball &operator=(const Ball &) = default; // opérateur d'affectation par défaut
 
-    bool check_ball() const; // vérifie que la balle est dans l'arène et que sa vitesse est valide
+    // vérifie que la balle est dans l'arène et que sa vitesse est valide
+    bool check_ball() const;
 
     // --- Détection de collisions ---
     bool collision_ball(const Ball &other, bool epsil = false) const;
     bool collision_brick(const Brick &b, bool epsil = false) const;
     bool collision_paddle(const Paddle &p, bool epsil = false) const;
-    bool lost() const; // indique si la balle est perdue en dehors de l'arène inférieure
+    bool lost() const; // si la balle est perdue en dehors de l'arène inférieure
     bool hits_vertical_wall() const;
     bool hits_top_wall() const;
     void reverse_dx() { dx = -dx; }

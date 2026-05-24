@@ -9,8 +9,7 @@
 
 #include <string>
 
-namespace message
-{
+namespace message {
 // score must be >= 0
 std::string invalid_score(int score);
 // lives must be >= 0

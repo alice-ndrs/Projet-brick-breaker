@@ -334,14 +334,14 @@ void draw_split_square(const Square &sq, int niveau) {
     const double s = (sq.side - split_brick_gap) / 2;
     if (s < brick_size_min) { return; }
 
-    const double o = (split_brick_gap / 2.0) + (s / 2.0);
+    const double offset = (split_brick_gap / 2.0) + (s / 2.0);
     const double cx = sq.center.x;
     const double cy = sq.center.y;
 
-    Square new_sq[4] = {{{cx - o, cy - o}, s},
-                        {{cx + o, cy - o}, s},
-                        {{cx - o, cy + o}, s},
-                        {{cx + o, cy + o}, s}};
+    Square new_sq[4] = {{{cx - offset, cy - offset}, s},
+                        {{cx + offset, cy - offset}, s},
+                        {{cx - offset, cy + offset}, s},
+                        {{cx + offset, cy + offset}, s}};
 
     for (const auto &sq_prime : new_sq) {
         set_color(color[niveau]);
@@ -444,7 +444,6 @@ void My_window::on_drawing_left_click(int n_press, double x, double y) {
     update_infos();
     drawing.queue_draw();
 }
-
 
 void My_window::on_drawing_move(double x, double y) {
     const int width = drawing.get_width();

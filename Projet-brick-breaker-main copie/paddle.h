@@ -10,7 +10,8 @@ class Paddle {
     Paddle &operator=(const Paddle &) = default; // opérateur d'affectation par défaut
     Paddle(const Paddle &) = default;            // constructeur de copie par défaut
 
-    bool check_paddle(bool print_error = true, bool epsil = false) const; // vérifie que la raquette reste dans l'arène
+    // vérifie que la raquette reste dans l'arène
+    bool check_paddle(bool print_error = true, bool epsil = false) const;
 
     // --- Accesseurs ---
     double getX() const { return circle.center.x; }
