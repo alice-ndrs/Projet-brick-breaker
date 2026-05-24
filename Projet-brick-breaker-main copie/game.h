@@ -85,6 +85,7 @@ class Game {
     bool ball_hits_paddle(Ball &b);
     bool ball_hits_ball(Ball &b);
 
+    void process_ball_ball_collision(Ball &ball1, Ball &ball2);
     void process_ball_brick_collision(Ball &ball, const Brick &brick);
     void handle_brick_hit(const Point &incident_delta, Brick &brick);
 

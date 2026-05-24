@@ -13,7 +13,6 @@ void graphic_set_context(const Cairo::RefPtr<Cairo::Context> &cr) { ptcr = &cr; 
 // local functions
 void set_color(Color color) {
     double r(0.), g(0.), b(0.);
-
     switch (color) {
     case RED:
         r = 1.0;

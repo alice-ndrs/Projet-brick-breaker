@@ -186,19 +186,15 @@ void Game::set_initial_status() {
 void Game::update_balls() {
     for (auto &ball : balls) {
         Point initial_position = ball->get_position();
-
         ball->move();
         if (ball->lost()) {
             ball->inactive();
             continue;
         }
-
         unsigned nb_bounce = 0;
         bool collision = true;
-
         while (collision && nb_bounce < nb_bounce_max) {
             collision = false;
-
             if (ball->hits_vertical_wall()) {
                 ball->undo_move();
                 ball->reverse_dx();
@@ -216,7 +212,6 @@ void Game::update_balls() {
             } else if (ball_hits_ball(*ball)) {
                 collision = true;
             }
-
             if (collision) { ++nb_bounce; }
 
             if (ball->lost()) {
@@ -358,8 +353,8 @@ bool Game::decode_nb_bricks(istringstream &data) {
 }
 
 bool Game::decode_brick(istringstream &data) {
-    int type_value;    // type
-    double x, y, side; // position et côté
+    int type_value;
+    double x, y, side;
 
     if (!(data >> type_value >> x >> y >> side)) return false;
 
@@ -562,49 +557,53 @@ bool Game::ball_hits_ball(Ball &ball) {
         if (&ball == b.get()) continue;
 
         if (ball.collision_ball(*b, true)) {
-
-            const Point diff = ball.getCircle().center - b->getCircle().center;
-            const double dist = squared_norm(diff);
-            const double epsil_squared = epsil_zero * epsil_zero;
-
-            ball.undo_move();
-
-            if (dist > epsil_squared) {
-                const Point v = {ball.getDx(), ball.getDy()};
-                const Point v_b = {b->getDx(), b->getDy()};
-
-                const double vn = dot(v, diff) / dist;
-                const double vn_other = dot(v_b, diff) / dist;
-
-                const double r_autre = b->getR() * b->getR();
-                const double r = ball.getR() * ball.getR();
-                const double cte = 2 * r_autre / (r + r_autre);
-
-                const double impulsion = cte * (vn_other - vn);
-                Point new_v = v + impulsion * diff;
-                Point new_v_b = v_b - impulsion * (r / r_autre) * diff;
-
-                double d = sqrt(squared_norm(new_v));
-                if (d > epsil_zero && d > delta_norm_max) {
-                    new_v.x *= delta_norm_max / d;
-                    new_v.y *= delta_norm_max / d;
-                }
-                double d_b = sqrt(squared_norm(new_v_b));
-                if (d_b > epsil_zero && d_b > delta_norm_max) {
-                    new_v_b.x *= delta_norm_max / d_b;
-                    new_v_b.y *= delta_norm_max / d_b;
-                }
-
-                ball.set_delta(new_v.x, new_v.y);
-                b->set_delta(new_v_b.x, new_v_b.y);
-            } else {
-                ball.reverse_dy();
-            }
-            ball.move();
+            process_ball_ball_collision(ball, *b);
             return true;
         }
     }
     return false;
+}
+
+void Game::process_ball_ball_collision(Ball &ball, Ball &other) {
+    const Point diff = ball.getCircle().center - other.getCircle().center;
+    const double dist = squared_norm(diff);
+    const double epsil_squared = epsil_zero * epsil_zero;
+    ball.undo_move();
+
+    if (dist > epsil_squared) {
+        const Point v = {ball.getDx(), ball.getDy()};
+        const Point v_other = {other.getDx(), other.getDy()};
+
+        const double vn = dot(v, diff) / dist;
+        const double vn_other = dot(v_other, diff) / dist;
+
+        const double r_squared = ball.getR() * ball.getR();
+        const double r_other_squared = other.getR() * other.getR();
+
+        const double cte = 2 * r_other_squared / (r_squared + r_other_squared);
+        const double impulse = cte * (vn_other - vn);
+
+        Point new_v = v + impulse * diff;
+        Point new_v_other = v_other - impulse * (r_squared / r_other_squared) * diff;
+
+        double norm = sqrt(squared_norm(new_v));
+        if (norm > epsil_zero && norm > delta_norm_max) {
+            new_v.x *= delta_norm_max / norm;
+            new_v.y *= delta_norm_max / norm;
+        }
+
+        double norm_other = sqrt(squared_norm(new_v_other));
+        if (norm_other > epsil_zero && norm_other > delta_norm_max) {
+            new_v_other.x *= delta_norm_max / norm_other;
+            new_v_other.y *= delta_norm_max / norm_other;
+        }
+
+        ball.set_delta(new_v.x, new_v.y);
+        other.set_delta(new_v_other.x, new_v_other.y);
+    } else {
+        ball.reverse_dy();
+    }
+    ball.move();
 }
 
 void Game::process_ball_brick_collision(Ball &ball, const Brick &brick) {
