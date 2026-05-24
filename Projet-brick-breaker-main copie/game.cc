@@ -12,78 +12,10 @@ using namespace std;
 //------------- Constructeur Game -------------
 
 Game::Game(int lives, int score)
-    : lives(lives), score(score), paddle(), status(Status::ONGOING), etat(SCORE),
+    : lives(lives), score(score), paddle(), status(Status::ONGOING), state(SCORE),
       total(0), count(0) {}
 
-//------------- Gestion du jeu -------------
-// reinitialise l'etat du jeu
-void Game::reset() {
-    etat = SCORE;
-    total = 0;
-    count = 0;
-    lives = 0;
-    score = 0;
-    bricks.clear();
-    balls.clear();
-    pending_balls.clear();
-    pending_bricks.clear();
-    paddle = Paddle();
-    status = Status::ONGOING;
-}
-
-void Game::nettoyer_objets() {
-    for (size_t i = 0; i < balls.size();) {
-        if (balls[i]->clear()) {
-            balls.erase(balls.begin() + i);
-        } else {
-            i++;
-        }
-    }
-
-    for (size_t i = 0; i < bricks.size();) {
-        if (bricks[i]->clear()) {
-            bricks.erase(bricks.begin() + i);
-        } else {
-            i++;
-        }
-    }
-}
-
-// cette fonction recoit un ligne de donnee puis decider quelle methode
-// appeler
-bool Game::decodage_ligne(istringstream &data) {
-    switch (etat) {
-    case SCORE:
-        return decodage_score(data);
-
-    case LIVES:
-        return decodage_lives(data);
-
-    case PADDLE:
-        return decodage_paddle(data);
-
-    case NB_BRICKS:
-        return decodage_nb_bricks(data);
-
-    case BRICKS:
-        return decodage_brick(data);
-
-    case NB_BALLS:
-        return decodage_nb_balls(data);
-
-    case BALLS:
-        return decodage_ball(data);
-
-    case FIN:
-        return false;
-
-    default:
-        return false;
-    }
-
-    return false;
-}
-
+// ------- Charger le jeu --------
 bool Game::get_level(const string &filename) // méthode de lecture de fichier
 {
     reset(); // On repart de zero avant de charger
@@ -97,13 +29,13 @@ bool Game::get_level(const string &filename) // méthode de lecture de fichier
 
             istringstream data(line);
 
-            if (decodage_ligne(data) == false) {
+            if (decode_line(data) == false) {
                 reset();
                 return false;
             }
         }
 
-        if (etat != FIN) {
+        if (state != FIN) {
             reset();
             return false;
         }
@@ -150,15 +82,74 @@ bool Game::save_level(const string &filename) {
     return false;
 }
 
+//-------- Interface de gestion du jeu --------
+void Game::reset() { // réinitialise l'état du jeu
+    state = SCORE;
+    total = 0;
+    count = 0;
+    lives = 0;
+    score = 0;
+    bricks.clear();
+    balls.clear();
+    pending_balls.clear();
+    pending_bricks.clear();
+    paddle = Paddle();
+    status = Status::ONGOING;
+}
+
 void Game::update() {
     if (status != Status::ONGOING) return;
 
     update_balls();
-    nettoyer_objets();
+    cleanup_objects();
     add_pending_objects();
     update_status();
 }
 
+void Game::update_paddle(double target_x) {
+    const double old_x = paddle.getX();
+    const double diff = target_x - old_x;
+    double new_x = old_x;
+
+    if (std::abs(diff) <= delta_norm_max) {
+        new_x = target_x;
+    } else {
+        if (diff > 0) {
+            new_x = old_x + delta_norm_max;
+        } else {
+            new_x = old_x - delta_norm_max;
+        }
+    }
+
+    paddle.setX(new_x);
+
+    if (!paddle.check_paddle(false, true)) {
+        paddle.setX(old_x);
+    } else {
+        for (const auto &brick : bricks) {
+            if (circle_intersects_square(paddle.getCircle(), brick->getSquare(),
+                                         true)) {
+                paddle.setX(old_x);
+                break;
+            }
+        }
+    }
+    paddle.setPrevX(old_x);
+}
+
+void Game::create_new_ball() {
+    if (status != Status::ONGOING) return;
+    if (!balls.empty()) return;
+    if (lives <= 0) return;
+
+    auto ball = std::make_unique<Ball>();
+    ball->reset(paddle);
+
+    balls.push_back(std::move(ball));
+    --lives;
+}
+
+// -------- Méthodes internes de gestion du jeu --------
 void Game::update_status() {
     if (status != Status::ONGOING) return;
 
@@ -190,44 +181,6 @@ void Game::set_initial_status() {
     }
 
     status = Status::ONGOING;
-}
-
-bool Game::is_line_empty(istringstream &data) {
-    data >> ws;        // White space: on evite les espaces
-    return data.eof(); // return false si il rest du text
-}
-
-//------------- Mise a jour des Modules Game -------------
-
-void Game::update_paddle(double target_x) {
-    const double old_x = paddle.getX();
-    const double diff = target_x - old_x;
-    double new_x = old_x;
-
-    if (std::abs(diff) <= delta_norm_max) {
-        new_x = target_x;
-    } else {
-        if (diff > 0) {
-            new_x = old_x + delta_norm_max;
-        } else {
-            new_x = old_x - delta_norm_max;
-        }
-    }
-
-    paddle.setX(new_x);
-
-    if (!paddle.check_paddle(false, true)) {
-        paddle.setX(old_x);
-    } else {
-        for (const auto &brick : bricks) {
-            if (circle_intersects_square(paddle.getCircle(), brick->getSquare(),
-                                         true)) {
-                paddle.setX(old_x);
-                break;
-            }
-        }
-    }
-    paddle.setPrevX(old_x);
 }
 
 void Game::update_balls() {
@@ -277,18 +230,6 @@ void Game::update_balls() {
     }
 }
 
-void Game::create_new_ball() {
-    if (status != Status::ONGOING) return;
-    if (!balls.empty()) return;
-    if (lives <= 0) return;
-
-    auto ball = std::make_unique<Ball>();
-    ball->reset(paddle);
-
-    balls.push_back(std::move(ball));
-    --lives;
-}
-
 void Game::add_pending_objects() {
     for (auto &ball : pending_balls) {
         balls.push_back(std::move(ball));
@@ -301,9 +242,61 @@ void Game::add_pending_objects() {
     pending_bricks.clear();
 }
 
-//------------- Fonctions de Décodage Spécifiques -------------
+void Game::cleanup_objects() {
+    for (size_t i = 0; i < balls.size();) {
+        if (balls[i]->clear()) {
+            balls.erase(balls.begin() + i);
+        } else {
+            i++;
+        }
+    }
 
-bool Game::decodage_score(istringstream &data) {
+    for (size_t i = 0; i < bricks.size();) {
+        if (bricks[i]->clear()) {
+            bricks.erase(bricks.begin() + i);
+        } else {
+            i++;
+        }
+    }
+}
+
+// -------- Méthodes de décodage --------
+// cette fonction reçoit une ligne de données puis décide quelle méthode
+// appeler
+bool Game::decode_line(istringstream &data) {
+    switch (state) {
+    case SCORE:
+        return decode_score(data);
+
+    case LIVES:
+        return decode_lives(data);
+
+    case PADDLE:
+        return decode_paddle(data);
+
+    case NB_BRICKS:
+        return decode_nb_bricks(data);
+
+    case BRICKS:
+        return decode_brick(data);
+
+    case NB_BALLS:
+        return decode_nb_balls(data);
+
+    case BALLS:
+        return decode_ball(data);
+
+    case FIN:
+        return false;
+
+    default:
+        return false;
+    }
+
+    return false;
+}
+
+bool Game::decode_score(istringstream &data) {
     int score;
     if (!(data >> score)) return false;
 
@@ -314,11 +307,11 @@ bool Game::decodage_score(istringstream &data) {
 
     if (!is_line_empty(data)) return false;
     this->score = score;
-    etat = LIVES;
+    state = LIVES;
     return true;
 }
 
-bool Game::decodage_lives(istringstream &data) {
+bool Game::decode_lives(istringstream &data) {
     int lives;
     if (!(data >> lives)) return false;
     if (!is_line_empty(data)) return false;
@@ -329,11 +322,11 @@ bool Game::decodage_lives(istringstream &data) {
     }
 
     this->lives = lives;
-    etat = PADDLE;
+    state = PADDLE;
     return true;
 }
 
-bool Game::decodage_paddle(istringstream &data) {
+bool Game::decode_paddle(istringstream &data) {
     double xPaddle, yPaddle, rPaddle;
     if (!(data >> xPaddle >> yPaddle >> rPaddle)) return false;
     if (!is_line_empty(data)) return false;
@@ -342,11 +335,11 @@ bool Game::decodage_paddle(istringstream &data) {
     if (!p.check_paddle()) return false; // limites arene
 
     this->paddle = p;
-    etat = NB_BRICKS;
+    state = NB_BRICKS;
     return true;
 }
 
-bool Game::decodage_nb_bricks(istringstream &data) {
+bool Game::decode_nb_bricks(istringstream &data) {
     int nb_brick;
     if (!(data >> nb_brick)) return false;
     if (!is_line_empty(data)) return false;
@@ -357,16 +350,16 @@ bool Game::decodage_nb_bricks(istringstream &data) {
     count = 0;
     // si 0 briques -> on saute à la lecture des Ball
     if (nb_brick == 0) {
-        etat = NB_BALLS;
+        state = NB_BALLS;
     } else {
-        etat = BRICKS;
+        state = BRICKS;
     }
     return true;
 }
 
-bool Game::decodage_brick(istringstream &data) {
+bool Game::decode_brick(istringstream &data) {
     int type_value;    // type
-    double x, y, side; // position et cote
+    double x, y, side; // position et côté
 
     if (!(data >> type_value >> x >> y >> side)) return false;
 
@@ -401,12 +394,12 @@ bool Game::decodage_brick(istringstream &data) {
 
     ++count;
 
-    if (count == total) { etat = NB_BALLS; }
+    if (count == total) { state = NB_BALLS; }
 
     return true;
 }
 
-bool Game::decodage_nb_balls(istringstream &data) {
+bool Game::decode_nb_balls(istringstream &data) {
     int nb_ball;
     if (!(data >> nb_ball)) return false;
     if (!is_line_empty(data)) return false;
@@ -417,14 +410,14 @@ bool Game::decodage_nb_balls(istringstream &data) {
     count = 0;
 
     if (nb_ball == 0) {
-        etat = FIN;
+        state = FIN;
     } else {
-        etat = BALLS;
+        state = BALLS;
     }
     return true;
 }
 
-bool Game::decodage_ball(istringstream &data) {
+bool Game::decode_ball(istringstream &data) {
     double xBall, yBall, rBall, dx, dy;
     if (!(data >> xBall >> yBall >> rBall >> dx >> dy)) return false;
     if (!is_line_empty(data)) return false;
@@ -434,12 +427,17 @@ bool Game::decodage_ball(istringstream &data) {
     balls.push_back(std::move(b));
     ++count;
 
-    if (count == total) { etat = FIN; }
+    if (count == total) { state = FIN; }
     return true;
 }
 
-//------------- Gestion des collisions -------------
+bool Game::is_line_empty(istringstream &data) {
+    data >> ws;        // White space: on evite les espaces
+    return data.eof(); // return false si il rest du text
+}
 
+
+//------------- Gestion des collisions -------------
 bool Game::check_collisions() const {
     if (collision_bricks()) return true;
     if (collision_balls()) return true;
@@ -505,6 +503,7 @@ bool Game::collision_brick_paddle() const {
     return false;
 }
 
+// -------- Gestion des rebonds --------
 bool Game::ball_hits_brick(Ball &ball) {
     for (auto &brick : bricks) {
         if (brick->clear()) continue;
@@ -521,69 +520,6 @@ bool Game::ball_hits_brick(Ball &ball) {
         }
     }
     return false;
-}
-
-void Game::process_ball_brick_collision(Ball &ball, const Brick &brick) {
-    const Point difference = ball.getCircle().center - brick.getSquare().center;
-    const double half = brick.getC() / 2.0;
-
-    const Point bounded = {// pt du carré le + proche du centre de la balle
-                           std::max(-half, std::min(difference.x, half)),
-                           std::max(-half, std::min(difference.y, half))};
-
-    const Point normal = difference - bounded; // direction nominale/normale du choc
-    const double normal_squared_norm = squared_norm(normal);
-    const double epsil_squared = epsil_zero * epsil_zero;
-
-    ball.undo_move();
-
-    if (normal_squared_norm > epsil_squared) {
-        const Point v = {ball.getDx(), ball.getDy()};
-
-        // partie de la vitesse dirigée selon la normale
-        const Point vn = (dot(v, normal) / normal_squared_norm) * normal;
-        const Point new_v = v - 2.0 * vn; // on inverse que la normale
-
-        ball.set_delta(new_v.x, new_v.y);
-    } else {
-        // pour collisions haute vitesse
-        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) {
-            ball.reverse_dx();
-        } else {
-            ball.reverse_dy();
-        }
-    }
-    ball.move();
-}
-
-void Game::handle_brick_hit(const Point &incident_delta, Brick &brick) {
-    const BrickType type = brick.getType();
-    const double x = brick.getX();
-    const double y = brick.getY();
-
-    std::vector<std::unique_ptr<Brick>> new_bricks;
-
-    // On prépare les nouvelles briques avant de modifier le vector bricks
-    if (type == BrickType::SPLIT) {
-        auto *split_brick = dynamic_cast<Split_brick *>(&brick);
-        if (split_brick) { new_bricks = split_brick->split(); }
-    }
-
-    // L'ancienne brique est marquée comme détruite / décrémentée
-    brick.hit();
-
-    if (type == BrickType::BALL) {
-        auto new_ball = std::make_unique<Ball>();
-        new_ball->set_position({x, y});
-        new_ball->set_delta(incident_delta.x, incident_delta.y);
-
-        pending_balls.push_back(std::move(new_ball));
-    }
-
-    // On ajoute les sous-briques seulement après brick.hit()
-    for (auto &new_brick : new_bricks) {
-        pending_bricks.push_back(std::move(new_brick));
-    }
 }
 
 bool Game::ball_hits_paddle(Ball &ball) {
@@ -670,3 +606,70 @@ bool Game::ball_hits_ball(Ball &ball) {
     }
     return false;
 }
+
+void Game::process_ball_brick_collision(Ball &ball, const Brick &brick) {
+    const Point difference = ball.getCircle().center - brick.getSquare().center;
+    const double half = brick.getC() / 2.0;
+
+    const Point bounded = {// pt du carré le + proche du centre de la balle
+                           std::max(-half, std::min(difference.x, half)),
+                           std::max(-half, std::min(difference.y, half))};
+
+    const Point normal = difference - bounded; // direction nominale/normale du choc
+    const double normal_squared_norm = squared_norm(normal);
+    const double epsil_squared = epsil_zero * epsil_zero;
+
+    ball.undo_move();
+
+    if (normal_squared_norm > epsil_squared) {
+        const Point v = {ball.getDx(), ball.getDy()};
+
+        // partie de la vitesse dirigée selon la normale
+        const Point vn = (dot(v, normal) / normal_squared_norm) * normal;
+        const Point new_v = v - 2.0 * vn; // on inverse que la normale
+
+        ball.set_delta(new_v.x, new_v.y);
+    } else {
+        // pour collisions haute vitesse
+        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) {
+            ball.reverse_dx();
+        } else {
+            ball.reverse_dy();
+        }
+    }
+    ball.move();
+}
+
+void Game::handle_brick_hit(const Point &incident_delta, Brick &brick) {
+    const BrickType type = brick.getType();
+    const double x = brick.getX();
+    const double y = brick.getY();
+
+    std::vector<std::unique_ptr<Brick>> new_bricks;
+
+    // On prépare les nouvelles briques avant de modifier le vector bricks
+    if (type == BrickType::SPLIT) {
+        auto *split_brick = dynamic_cast<Split_brick *>(&brick);
+        if (split_brick) { new_bricks = split_brick->split(); }
+    }
+
+    // L'ancienne brique est marquée comme détruite / décrémentée
+    brick.hit();
+
+    if (type == BrickType::BALL) {
+        auto new_ball = std::make_unique<Ball>();
+        new_ball->set_position({x, y});
+        new_ball->set_delta(incident_delta.x, incident_delta.y);
+
+        pending_balls.push_back(std::move(new_ball));
+    }
+
+    // On ajoute les sous-briques seulement après brick.hit()
+    for (auto &new_brick : new_bricks) {
+        pending_bricks.push_back(std::move(new_brick));
+    }
+}
+
+
+
+

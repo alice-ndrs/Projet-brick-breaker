@@ -11,7 +11,7 @@
 
 enum Status { ONGOING, WON, LOST };
 
-enum EtatLecture { // differente lecture
+enum ReadingState {
     SCORE,
     LIVES,
     PADDLE,
@@ -33,12 +33,13 @@ class Game {
     Game(Game &&) = default;
     Game &operator=(Game &&) = default;
 
+    // ------ Charger le jeu ------
     bool get_level(
         const std::string &filename); // lit un fichier de niveau et initialise le jeu
     bool save_level(
         const std::string &filename); // sauvegarde le niveau courant dans un fichier
 
-    //------ Méthodes de gestion du jeu ------
+    // ------ Interface de gestion du jeu ------
     void reset();                        // remet le jeu dans son état initial
     void update();                       // met à jour la physique et l'état du niveau
     void update_paddle(double target_x); // déplace la raquette vers la position cible
@@ -54,32 +55,32 @@ class Game {
     Status get_status() const { return status; }
 
   private:
-    // --- Méthodes de gestion du jeu ---
+    // ------ Méthodes internes de gestion du jeu ------
     void update_status();
     void set_initial_status();
     void update_balls();
     void add_pending_objects();
-    void nettoyer_objets();
+    void cleanup_objects();
 
-    // --- Méthodes de décodage ---
-    bool decodage_ligne(std::istringstream &data);
-    bool decodage_score(std::istringstream &data);
-    bool decodage_lives(std::istringstream &data);
-    bool decodage_paddle(std::istringstream &data);
-    bool decodage_nb_bricks(std::istringstream &data);
-    bool decodage_brick(std::istringstream &data);
-    bool decodage_nb_balls(std::istringstream &data);
-    bool decodage_ball(std::istringstream &data);
+    // ------ Méthodes de décodage ------
+    bool decode_line(std::istringstream &data);
+    bool decode_score(std::istringstream &data);
+    bool decode_lives(std::istringstream &data);
+    bool decode_paddle(std::istringstream &data);
+    bool decode_nb_bricks(std::istringstream &data);
+    bool decode_brick(std::istringstream &data);
+    bool decode_nb_balls(std::istringstream &data);
+    bool decode_ball(std::istringstream &data);
     bool is_line_empty(std::istringstream &data);
 
-    // --- Gestion des collisions ---
+    // ------ Gestion des collisions ------
     bool check_collisions() const;
     bool collision_bricks() const;
     bool collision_balls() const;
     bool collision_ball_brick() const;
     bool collision_ball_paddle() const;
     bool collision_brick_paddle() const;
-    // --- Gestion des rebonds ---
+    // ------ Gestion des rebonds ------
     bool ball_hits_brick(Ball &b);
     bool ball_hits_paddle(Ball &b);
     bool ball_hits_ball(Ball &b);
@@ -98,7 +99,7 @@ class Game {
     Paddle paddle;
 
     Status status;
-    EtatLecture etat;
+    ReadingState state;
     unsigned int total;
     unsigned int count;
 };

@@ -8,18 +8,18 @@
 
 class Paddle;
 
-// enum differents types de Brick
 enum class BrickType { RAINBOW = 0, BALL = 1, SPLIT = 2 };
 
 class Brick {
   public:
     Brick(BrickType type, double x, double y, double side);
-    virtual ~Brick() = default;               // destructeur virtuel par defaut
-    Brick(const Brick &) = delete;            // constructeur de copie par défaut
-    Brick &operator=(const Brick &) = delete; // opérateur d'affectation par defaut
+    // Règle des 3
+    virtual ~Brick() = default;
+    Brick(const Brick &) = delete;
+    Brick &operator=(const Brick &) = delete;
 
-    bool check_brick()
-        const; // vérifie que la brique est bien positionnée et de taille valide
+    // vérifie que la brique est bien positionnée et de taille valide
+    bool check_brick() const;
     virtual bool check_specific() const { return true; }
 
     // --- Détection de collisions ---
@@ -40,7 +40,7 @@ class Brick {
     virtual int get_hit_points() const { return 1; }
 
   protected:
-    BrickType t;   // type de brick parmis les 3
+    BrickType t;   // type de brique parmi les 3
     Square square; // position et taille
     bool remove;   // true si la brick est a enlever
 };
@@ -50,21 +50,23 @@ class Brick {
 class Rainbow_brick : public Brick {
   public:
     Rainbow_brick(double x, double y, double c, int h);
+    // Règle des 3
     ~Rainbow_brick() override = default;
     Rainbow_brick(const Rainbow_brick &) = delete;
     Rainbow_brick &operator=(const Rainbow_brick &) = delete;
 
     bool check_specific() const override;
-    void hit() override; // surcharge pour decrementer les vies
-                         // avant de la detruire
+    void hit() override; // surcharge pour décrémenter les vies
+                        // avant de la détruire
     int get_hit_points() const override { return hit_points; }
 
   private:
-    int hit_points; // nbre de coups necessaires pour la casser
+    int hit_points;
 };
 
 class Ball_brick : public Brick {
   public:
+    // Règle des 3
     ~Ball_brick() override = default;
     Ball_brick(const Ball_brick &) = delete;
     Ball_brick &operator=(const Ball_brick &) = delete;
@@ -75,6 +77,7 @@ class Ball_brick : public Brick {
 
 class Split_brick : public Brick {
   public:
+    // Règle des 3
     ~Split_brick() override = default;
     Split_brick(const Split_brick &) = delete;
     Split_brick &operator=(const Split_brick &) = delete;

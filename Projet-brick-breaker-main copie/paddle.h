@@ -6,9 +6,10 @@
 class Paddle {
   public:
     Paddle(double x = 0, double y = 0, double r = 0); // constructeur par défaut
-    ~Paddle() = default;                              // destructeur par défaut
-    Paddle &operator=(const Paddle &) = default; // opérateur d'affectation par défaut
-    Paddle(const Paddle &) = default;            // constructeur de copie par défaut
+    // Règle des 3
+    ~Paddle() = default;
+    Paddle &operator=(const Paddle &) = default;
+    Paddle(const Paddle &) = default;
 
     // vérifie que la raquette reste dans l'arène
     bool check_paddle(bool print_error = true, bool epsil = false) const;

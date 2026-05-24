@@ -7,12 +7,12 @@
 
 using namespace std;
 
-//------------- Constructeur Ball -------------
+//------- Constructeur Ball -------
 
 Ball::Ball(double x, double y, double r, double dx, double dy)
     : circle{{x, y}, r}, dx(dx), dy(dy), active(true) {}
 
-//------------- Fonction de test pour la classe Ball -------------
+//------- Fonction de test pour la classe Ball -------
 
 bool Ball::check_ball() const // verifie si Ball est dans l'arene et
 {                             // et sa vitesse est conforme
@@ -37,7 +37,7 @@ bool Ball::check_ball() const // verifie si Ball est dans l'arene et
     return true;
 }
 
-// --- Détection de collisions ---
+// ------- Détection de collisions -------
 
 bool Ball::collision_ball(const Ball &other, bool epsil) const // 2 Ball se superpose
 {
@@ -56,7 +56,7 @@ bool Ball::collision_paddle(const Paddle &paddle,
     return circle_intersects_circle(circle, paddle.getCircle(), epsil);
 }
 
-// --- Methode du Jeu ---
+// ------- Méthode du Jeu -------
 
 bool Ball::lost() const { return circle.center.y < 0; }
 

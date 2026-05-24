@@ -69,7 +69,7 @@ bool Brick::collision_paddle(const Paddle &p, bool epsil) const // superposition
 // --- Fonction de Jeu ---
 
 void Rainbow_brick::hit() {
-    if (hit_points > 0) { // on decremente si la Brick a encore des hits points
+    if (hit_points > 0) { // on décrémente si la brique a encore des points de vie
         --hit_points;
     }
 

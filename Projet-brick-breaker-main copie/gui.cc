@@ -147,6 +147,8 @@ void My_window::step_clicked() {
     drawing.queue_draw();
 }
 
+// ------- Gestion du clavier -------
+
 void My_window::set_key_controller() {
     auto contr = Gtk::EventControllerKey::create();
     contr->signal_key_pressed().connect(sigc::mem_fun(*this, &My_window::key_pressed),
@@ -174,6 +176,8 @@ bool My_window::key_pressed(guint keyval, guint keycode, Gdk::ModifierType state
     }
     return false;
 }
+
+// ------- Gestion des fichiers -------
 
 void My_window::set_dialog(Gtk::FileChooserDialog *dialog) {
     dialog->set_modal(true);
@@ -319,11 +323,36 @@ void My_window::update_buttons() {
     buttons[STEP].set_sensitive(ongoing);
 }
 
+// ------- Méthodes de dessin -------
+
 void My_window::set_drawing() {
     drawing.set_content_width(drawing_size);
     drawing.set_content_height(drawing_size);
     drawing.set_expand();
     drawing.set_draw_func(sigc::mem_fun(*this, &My_window::on_draw));
+}
+
+void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width,
+                        int height) {
+    graphic_set_context(cr);
+    const double side(min(width, height));
+    cr->translate((width - side) / 2, (height + side) / 2);
+    cr->scale(side / (arena_size), -side / (arena_size));
+
+    draw_arena();
+
+    if (!level_loaded) return;
+
+    draw_paddle(cr);
+    draw_bricks(cr);
+    draw_balls(cr);
+}
+
+void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context> &cr) const {
+    set_color(BLACK);
+    draw_arc(m_game.get_paddle().getCircle());
+    cr->set_line_width(1.0);
+    cr->stroke();
 }
 
 void draw_split_square(const Square &sq, int niveau) {
@@ -348,29 +377,6 @@ void draw_split_square(const Square &sq, int niveau) {
         draw_square(sq_prime);
         draw_split_square(sq_prime, niveau + 1);
     }
-}
-
-void My_window::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width,
-                        int height) {
-    graphic_set_context(cr);
-    const double side(min(width, height));
-    cr->translate((width - side) / 2, (height + side) / 2);
-    cr->scale(side / (arena_size), -side / (arena_size));
-
-    draw_arena();
-
-    if (!level_loaded) return;
-
-    draw_paddle(cr);
-    draw_bricks(cr);
-    draw_balls(cr);
-}
-
-void My_window::draw_paddle(const Cairo::RefPtr<Cairo::Context> &cr) const {
-    set_color(BLACK);
-    draw_arc(m_game.get_paddle().getCircle());
-    cr->set_line_width(1.0);
-    cr->stroke();
 }
 
 void My_window::draw_bricks(const Cairo::RefPtr<Cairo::Context> &cr) const {
@@ -421,6 +427,8 @@ void My_window::draw_balls(const Cairo::RefPtr<Cairo::Context> &cr) const {
         cr->fill();
     }
 }
+
+// ------- Méthode de la souris -------
 
 void My_window::set_mouse_controller() {
     auto left_click = Gtk::GestureClick::create();
