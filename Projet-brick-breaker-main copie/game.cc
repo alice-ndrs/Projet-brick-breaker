@@ -1,29 +1,27 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include "Game.h"
+#include "Brick.h"
+#include "Message.h"
 #include <algorithm>
 #include <cmath>
-#include "Message.h"
-#include "Brick.h"
-#include "Game.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
 //------------- Constructeur Game -------------
 
-Game::Game (int lives,int score)
-    : lives(lives),score(score), paddle(), 
-    status(Status::ONGOING), etat(SCORE), total(0), count(0)
-{}
+Game::Game(int lives, int score)
+    : lives(lives), score(score), paddle(), status(Status::ONGOING), etat(SCORE),
+      total(0), count(0) {}
 
 //------------- Gestion du jeu -------------
-//reinitialise l'etat du jeu
-void Game::reset() 
-{
+// reinitialise l'etat du jeu
+void Game::reset() {
     etat = SCORE;
     total = 0;
     count = 0;
-    lives = 0; 
+    lives = 0;
     score = 0;
     bricks.clear();
     balls.clear();
@@ -33,12 +31,10 @@ void Game::reset()
     status = Status::ONGOING;
 }
 
-
-void Game::nettoyer_objets()
-{
-    for (size_t i = 0; i < balls.size(); ) {
+void Game::nettoyer_objets() {
+    for (size_t i = 0; i < balls.size();) {
         if (balls[i]->clear()) {
-            balls.erase(balls.begin() + i); 
+            balls.erase(balls.begin() + i);
         } else {
             i++;
         }
@@ -55,54 +51,53 @@ void Game::nettoyer_objets()
 
 // cette fonction recoit un ligne de donnee puis decider quelle methode
 // appeler
-bool Game::decodage_ligne(istringstream& data)
-{
+bool Game::decodage_ligne(istringstream &data) {
     switch (etat) {
-        case SCORE:    
-            return decodage_score(data);
+    case SCORE:
+        return decodage_score(data);
 
-        case LIVES:
-            return decodage_lives(data);
+    case LIVES:
+        return decodage_lives(data);
 
-        case PADDLE:
-            return decodage_paddle(data);
+    case PADDLE:
+        return decodage_paddle(data);
 
-        case NB_BRICKS:
-            return decodage_nb_bricks(data);
+    case NB_BRICKS:
+        return decodage_nb_bricks(data);
 
-        case BRICKS:
-            return decodage_brick(data);
+    case BRICKS:
+        return decodage_brick(data);
 
-        case NB_BALLS:
-            return decodage_nb_balls(data);
+    case NB_BALLS:
+        return decodage_nb_balls(data);
 
-        case BALLS:
-            return decodage_ball(data);
+    case BALLS:
+        return decodage_ball(data);
 
-        case FIN:
-            return false;
+    case FIN:
+        return false;
+
+    default:
+        return false;
     }
 
     return false;
 }
 
-
-bool Game::get_level(const string& filename) // méthode de lecture de fichier
-{ 
-    reset();  // On repart de zero avant de charger
+bool Game::get_level(const string &filename) // méthode de lecture de fichier
+{
+    reset(); // On repart de zero avant de charger
 
     ifstream file(filename);
-    if (!file.fail()) 
-    {
+    if (!file.fail()) {
         string line; // lecture ligne par ligne en ignorant les espaces
-        while (getline(file>>ws, line)) {
+        while (getline(file >> ws, line)) {
             if (line.empty()) continue;
             if (line[0] == '#') continue;
 
-            istringstream data(line);
+        istringstream data(line);
 
-            if (decodage_ligne(data) == false)
-            {
+            if (decodage_ligne(data) == false) {
                 reset();
                 return false;
             }
@@ -124,43 +119,38 @@ bool Game::get_level(const string& filename) // méthode de lecture de fichier
     return false;
 }
 
-
-bool Game::save_level(const string& filename)
-{
+bool Game::save_level(const string &filename) {
     ofstream file(filename);
-    if (!file.fail()) 
-    {
+    if (!file.fail()) {
         file << score << endl;
         file << lives << endl;
         file << paddle.getX() << " " << paddle.getY() << " " << paddle.getR() << endl;
 
-        file << bricks.size()<< endl;
+        file << bricks.size() << endl;
 
-        for (size_t i = 0; i < bricks.size(); ++i){
-            file << static_cast<int>(bricks[i]->getType()) << " " 
-                << bricks[i]->getX() << " " 
-                << bricks[i]->getY();
+        for (size_t i = 0; i < bricks.size(); ++i) {
+            file << static_cast<int>(bricks[i]->getType()) << " " << bricks[i]->getX()
+                 << " " << bricks[i]->getY();
             file << " " << bricks[i]->getC();
-            if (bricks[i]->getType() == BrickType::RAINBOW){
+            if (bricks[i]->getType() == BrickType::RAINBOW) {
                 file << " " << bricks[i]->get_hit_points();
             }
             file << endl;
         }
 
         file << balls.size() << endl;
-        for (size_t i = 0; i < balls.size(); ++i){
-            file << balls[i]->getX() << " " << balls[i]->getY() << " " << balls[i]->getR();
+        for (size_t i = 0; i < balls.size(); ++i) {
+            file << balls[i]->getX() << " " << balls[i]->getY() << " "
+                 << balls[i]->getR();
             file << " " << balls[i]->getDx() << " " << balls[i]->getDy();
             file << endl;
         }
         return true;
     }
     return false;
-
 }
 
-void Game::update() 
-{
+void Game::update() {
     if (status != Status::ONGOING) return;
 
     update_balls();
@@ -169,19 +159,16 @@ void Game::update()
     update_status();
 }
 
-void Game::update_status()
-{
+void Game::update_status() {
     if (status != Status::ONGOING) return;
-    
-    if (balls.empty() && lives == 0) 
-    {
+
+    if (balls.empty() && lives == 0) {
         status = Status::LOST;
         cout << message::lost();
         return;
     }
-    
-    if (bricks.empty()) 
-    {
+
+    if (bricks.empty()) {
         score += score_per_life * lives;
         status = Status::WON;
         cout << message::won();
@@ -189,17 +176,14 @@ void Game::update_status()
     }
 }
 
-void Game::set_initial_status()
-{
-    if (balls.empty() && lives == 0) 
-    {
+void Game::set_initial_status() {
+    if (balls.empty() && lives == 0) {
         status = Status::LOST;
         cout << message::lost();
         return;
     }
 
-    if (bricks.empty()) 
-    {
+    if (bricks.empty()) {
         status = Status::WON;
         cout << message::won();
         return;
@@ -208,48 +192,36 @@ void Game::set_initial_status()
     status = Status::ONGOING;
 }
 
-
-bool Game::is_line_empty(istringstream& data)
-{
-    data >> ws;               // White space: on evite les espaces 
-    return data.eof();      //return false si il rest du text
+bool Game::is_line_empty(istringstream &data) {
+    data >> ws;        // White space: on evite les espaces
+    return data.eof(); // return false si il rest du text
 }
 
 //------------- Mise a jour des Modules Game -------------
 
-void Game::update_paddle(double target_x)
-{
+void Game::update_paddle(double target_x) {
     const double old_x = paddle.getX();
     const double diff = target_x - old_x;
     double new_x = old_x;
 
-    if (std::abs(diff) <= delta_norm_max)
-    {   
+    if (std::abs(diff) <= delta_norm_max) {
         new_x = target_x;
-    }
-    else
-    {
+    } else {
         if (diff > 0) {
             new_x = old_x + delta_norm_max;
-        }
-        else {
+        } else {
             new_x = old_x - delta_norm_max;
         }
     }
 
     paddle.setX(new_x);
 
-    if (paddle.check_paddle(false, true))
-    {
+    if (!paddle.check_paddle(false, true)) {
         paddle.setX(old_x);
-    }
-    else
-    {
-        for (const auto& brick : bricks)
-        {
-            if (circle_intersects_square(paddle.getCircle(),
-                    brick->getSquare(), true))
-            {
+    } else {
+        for (const auto &brick : bricks) {
+            if (circle_intersects_square(paddle.getCircle(), brick->getSquare(),
+                                         true)) {
                 paddle.setX(old_x);
                 break;
             }
@@ -258,12 +230,10 @@ void Game::update_paddle(double target_x)
     paddle.setPrevX(old_x);
 }
 
-void Game::update_balls()
-{
-    for (auto& ball : balls)
-    {
+void Game::update_balls() {
+    for (auto &ball : balls) {
         Point initial_position = ball->get_position();
-        
+
         ball->move();
         if (ball->lost()) {
             ball->inactive();
@@ -273,8 +243,7 @@ void Game::update_balls()
         unsigned nb_bounce = 0;
         bool collision = true;
 
-        while (collision && nb_bounce < nb_bounce_max)
-        {
+        while (collision && nb_bounce < nb_bounce_max) {
             collision = false;
 
             if (ball->hits_vertical_wall()) {
@@ -282,19 +251,21 @@ void Game::update_balls()
                 ball->reverse_dx();
                 ball->move();
                 collision = true;
-            }
-            else if (ball->hits_top_wall()) {
+            } else if (ball->hits_top_wall()) {
                 ball->undo_move();
                 ball->reverse_dy();
                 ball->move();
                 collision = true;
+            } else if (ball_hits_brick(*ball)) {
+                collision = true;
+            } else if (ball_hits_paddle(*ball)) {
+                collision = true;
+            } else if (ball_hits_ball(*ball)) {
+                collision = true;
             }
-            else if (ball_hits_brick(*ball)) {collision = true;}
-            else if (ball_hits_paddle(*ball)) {collision = true;}
-            else if (ball_hits_ball(*ball)) {collision = true;}
 
-            if (collision) {++nb_bounce;}
-            
+            if (collision) { ++nb_bounce; }
+
             if (ball->lost()) {
                 ball->inactive();
                 break;
@@ -306,8 +277,7 @@ void Game::update_balls()
     }
 }
 
-void Game::create_new_ball()
-{
+void Game::create_new_ball() {
     if (status != Status::ONGOING) return;
     if (!balls.empty()) return;
     if (lives <= 0) return;
@@ -319,16 +289,13 @@ void Game::create_new_ball()
     --lives;
 }
 
-void Game::add_pending_objects()
-{
-    for (auto& ball : pending_balls)
-    {
+void Game::add_pending_objects() {
+    for (auto &ball : pending_balls) {
         balls.push_back(std::move(ball));
     }
     pending_balls.clear();
 
-    for (auto& brick : pending_bricks)
-    {
+    for (auto &brick : pending_bricks) {
         bricks.push_back(std::move(brick));
     }
     pending_bricks.clear();
@@ -336,8 +303,7 @@ void Game::add_pending_objects()
 
 //------------- Fonctions de Décodage Spécifiques -------------
 
-bool Game::decodage_score(istringstream& data) 
-{
+bool Game::decodage_score(istringstream &data) {
     int score;
     if (!(data >> score)) return false;
 
@@ -352,9 +318,7 @@ bool Game::decodage_score(istringstream& data)
     return true;
 }
 
-
-bool Game::decodage_lives(istringstream& data) 
-{
+bool Game::decodage_lives(istringstream &data) {
     int lives;
     if (!(data >> lives)) return false;
     if (!is_line_empty(data)) return false;
@@ -367,33 +331,27 @@ bool Game::decodage_lives(istringstream& data)
     this->lives = lives;
     etat = PADDLE;
     return true;
-}   
+}
 
-
-bool Game::decodage_paddle(istringstream& data) 
-{
+bool Game::decodage_paddle(istringstream &data) {
     double xPaddle, yPaddle, rPaddle;
     if (!(data >> xPaddle >> yPaddle >> rPaddle)) return false;
     if (!is_line_empty(data)) return false;
-    
+
     Paddle p(xPaddle, yPaddle, rPaddle);
-    if (p.check_paddle()) return false; // limites arene
-    
+    if (!p.check_paddle()) return false; // limites arene
+
     this->paddle = p;
     etat = NB_BRICKS;
     return true;
 }
 
-
-bool Game::decodage_nb_bricks(istringstream& data) 
-{
+bool Game::decodage_nb_bricks(istringstream &data) {
     int nb_brick;
     if (!(data >> nb_brick)) return false;
     if (!is_line_empty(data)) return false;
 
-    if (nb_brick < 0) {
-        return false;
-    }
+    if (nb_brick < 0) { return false; }
 
     total = nb_brick;
     count = 0;
@@ -406,61 +364,55 @@ bool Game::decodage_nb_bricks(istringstream& data)
     return true;
 }
 
+bool Game::decodage_brick(istringstream &data) {
+    int type_value;    // type
+    double x, y, side; // position et cote
 
-bool Game::decodage_brick(istringstream& data) 
-{
-    int t; // type
-    double x, y, c; // position et cote
+    if (!(data >> type_value >> x >> y >> side)) return false;
 
-    if (!(data >> t >> x >> y >> c)) return false;
-
-    switch (t) {
-        case 0: { // Rainbow_brick-> paramètre supplémentaire (hit_points)
-            int h;
-            if (!(data >> h)) return false;
-            if (!is_line_empty(data)) return false;
-            auto b = std::make_unique<Rainbow_brick>(x, y, c, h);
-            if (b->check_brick()) return false;
-            bricks.push_back(std::move(b));
-            break;
-        }
-        case 1: {
-            if (!is_line_empty(data)) return false;
-            auto b = std::make_unique<Ball_brick>(x, y, c);
-            if (b->check_brick()) return false;
-            bricks.push_back(std::move(b));
-            break;
-        }
-        case 2: {
-            if (!is_line_empty(data)) return false;
-            auto b = std::make_unique<Split_brick>(x, y, c);
-            if (b->check_brick()) return false;
-            bricks.push_back(std::move(b));
-            break;
-        }
-        default:
-            cout << message::invalid_brick_type(t);
-            return false;
+    switch (type_value) {
+    case 0: { // Rainbow_brick-> paramètre supplémentaire (hit_points)
+        int hit_points;
+        if (!(data >> hit_points)) return false;
+        if (!is_line_empty(data)) return false;
+        auto b = std::make_unique<Rainbow_brick>(x, y, side, hit_points);
+        if (!b->check_brick()) return false;
+        bricks.push_back(std::move(b));
+        break;
+    }
+    case 1: {
+        if (!is_line_empty(data)) return false;
+        auto b = std::make_unique<Ball_brick>(x, y, side);
+        if (!b->check_brick()) return false;
+        bricks.push_back(std::move(b));
+        break;
+    }
+    case 2: {
+        if (!is_line_empty(data)) return false;
+        auto b = std::make_unique<Split_brick>(x, y, side);
+        if (!b->check_brick()) return false;
+        bricks.push_back(std::move(b));
+        break;
+    }
+    default:
+        cout << message::invalid_brick_type(type_value);
+        return false;
     }
 
     ++count;
 
-    if (count == total) {
-        etat = NB_BALLS;
-    }
+    if (count == total) { etat = NB_BALLS; }
 
     return true;
 }
 
-
-bool Game::decodage_nb_balls(istringstream& data) 
-{
+bool Game::decodage_nb_balls(istringstream &data) {
     int nb_ball;
     if (!(data >> nb_ball)) return false;
     if (!is_line_empty(data)) return false;
-    
+
     if (nb_ball < 0) return false;
-    
+
     total = nb_ball;
     count = 0;
 
@@ -472,41 +424,32 @@ bool Game::decodage_nb_balls(istringstream& data)
     return true;
 }
 
-
-bool Game::decodage_ball(istringstream& data) 
-{
+bool Game::decodage_ball(istringstream &data) {
     double xBall, yBall, rBall, dx, dy;
     if (!(data >> xBall >> yBall >> rBall >> dx >> dy)) return false;
     if (!is_line_empty(data)) return false;
 
     auto b = std::make_unique<Ball>(xBall, yBall, rBall, dx, dy);
-    if (b->check_ball()) {
-        return false;
-    }
+    if (!b->check_ball()) { return false; }
     balls.push_back(std::move(b));
     ++count;
 
-    if (count == total) {
-        etat = FIN;
-    }
+    if (count == total) { etat = FIN; }
     return true;
 }
 
 //------------- Gestion des collisions -------------
 
-int Game::check_collisions() const 
-{
-    if (collision_bricks()) return 1;
-    if (collision_balls()) return 1;
-    if (collision_ball_brick()) return 1;
-    if (collision_ball_paddle()) return 1;
-    if (collision_brick_paddle()) return 1;
-    return 0;
+bool Game::check_collisions() const {
+    if (collision_bricks()) return true;
+    if (collision_balls()) return true;
+    if (collision_ball_brick()) return true;
+    if (collision_ball_paddle()) return true;
+    if (collision_brick_paddle()) return true;
+    return false;
 }
 
-
-bool Game::collision_bricks() const 
-{
+bool Game::collision_bricks() const {
     for (size_t i = 0; i < bricks.size(); ++i) {
         for (size_t j = i + 1; j < bricks.size(); ++j) {
             if (bricks[i]->collision_brick(*bricks[j])) {
@@ -518,9 +461,7 @@ bool Game::collision_bricks() const
     return false;
 }
 
-
-bool Game::collision_balls() const 
-{
+bool Game::collision_balls() const {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = i + 1; j < balls.size(); ++j) {
             if (balls[i]->collision_ball(*balls[j])) {
@@ -532,9 +473,7 @@ bool Game::collision_balls() const
     return false;
 }
 
-
-bool Game::collision_ball_brick() const 
-{
+bool Game::collision_ball_brick() const {
     for (size_t i = 0; i < balls.size(); ++i) {
         for (size_t j = 0; j < bricks.size(); ++j) {
             if (balls[i]->collision_brick(*bricks[j])) {
@@ -546,9 +485,7 @@ bool Game::collision_ball_brick() const
     return false;
 }
 
-
-bool Game::collision_ball_paddle() const 
-{
+bool Game::collision_ball_paddle() const {
     for (size_t i = 0; i < balls.size(); ++i) {
         if (balls[i]->collision_paddle(paddle)) {
             cout << message::collision_paddle_ball(i);
@@ -558,9 +495,7 @@ bool Game::collision_ball_paddle() const
     return false;
 }
 
-
-bool Game::collision_brick_paddle() const
-{
+bool Game::collision_brick_paddle() const {
     for (size_t i = 0; i < bricks.size(); ++i) {
         if (bricks[i]->collision_paddle(paddle)) {
             cout << message::collision_paddle_brick(i);
@@ -570,16 +505,13 @@ bool Game::collision_brick_paddle() const
     return false;
 }
 
-bool Game::ball_hits_brick(Ball& ball) 
-{
-    for (auto& brick : bricks)
-    {
+bool Game::ball_hits_brick(Ball &ball) {
+    for (auto &brick : bricks) {
         if (brick->clear()) continue;
 
-        if (ball.collision_brick(*brick, true))
-        {
+        if (ball.collision_brick(*brick, true)) {
             Point incident_delta = {ball.getDx(), ball.getDy()};
-            
+
             process_ball_brick_collision(ball, *brick);
             handle_brick_hit(incident_delta, *brick);
 
@@ -591,24 +523,21 @@ bool Game::ball_hits_brick(Ball& ball)
     return false;
 }
 
-void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
-{
+void Game::process_ball_brick_collision(Ball &ball, const Brick &brick) {
     const Point difference = ball.getCircle().center - brick.getSquare().center;
     const double half = brick.getC() / 2.0;
 
-    const Point bounded = { // pt du carré le + proche du centre de la balle
-        std::max(-half, std::min(difference.x, half)),
-        std::max(-half, std::min(difference.y, half))
-    };
+    const Point bounded = {// pt du carré le + proche du centre de la balle
+                           std::max(-half, std::min(difference.x, half)),
+                           std::max(-half, std::min(difference.y, half))};
 
-    const Point normal = difference - bounded;// direction nominale/normale du choc
+    const Point normal = difference - bounded; // direction nominale/normale du choc
     const double normal_squared_norm = squared_norm(normal);
     const double epsil_squared = epsil_zero * epsil_zero;
 
     ball.undo_move();
 
-    if (normal_squared_norm > epsil_squared)
-    {
+    if (normal_squared_norm > epsil_squared) {
         const Point v = {ball.getDx(), ball.getDy()};
 
         // partie de la vitesse dirigée selon la normale
@@ -616,22 +545,18 @@ void Game::process_ball_brick_collision(Ball& ball, const Brick& brick)
         const Point new_v = v - 2.0 * vn; // on inverse que la normale
 
         ball.set_delta(new_v.x, new_v.y);
-    }
-    else
-    {
+    } else {
         // pour collisions haute vitesse
-        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) { 
-            ball.reverse_dx(); 
-        }
-        else { 
-            ball.reverse_dy(); 
+        if (std::abs(ball.getDx()) > std::abs(ball.getDy())) {
+            ball.reverse_dx();
+        } else {
+            ball.reverse_dy();
         }
     }
     ball.move();
 }
 
-void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
-{
+void Game::handle_brick_hit(const Point &incident_delta, Brick &brick) {
     const BrickType type = brick.getType();
     const double x = brick.getX();
     const double y = brick.getY();
@@ -639,39 +564,30 @@ void Game::handle_brick_hit(const Point& incident_delta, Brick& brick)
     std::vector<std::unique_ptr<Brick>> new_bricks;
 
     // On prépare les nouvelles briques avant de modifier le vector bricks
-    if (type == BrickType::SPLIT)
-    {
-        auto* split_brick = dynamic_cast<Split_brick*>(&brick);
-        if (split_brick)
-        {
-            new_bricks = split_brick->split();
-        }
+    if (type == BrickType::SPLIT) {
+        auto *split_brick = dynamic_cast<Split_brick *>(&brick);
+        if (split_brick) { new_bricks = split_brick->split(); }
     }
 
     // L'ancienne brique est marquée comme détruite / décrémentée
     brick.hit();
 
-    if (type == BrickType::BALL)
-    {
+    if (type == BrickType::BALL) {
         auto new_ball = std::make_unique<Ball>();
-        new_ball->set_position({ x, y });
+        new_ball->set_position({x, y});
         new_ball->set_delta(incident_delta.x, incident_delta.y);
 
         pending_balls.push_back(std::move(new_ball));
     }
 
     // On ajoute les sous-briques seulement après brick.hit()
-    for (auto& new_brick : new_bricks)
-    {
+    for (auto &new_brick : new_bricks) {
         pending_bricks.push_back(std::move(new_brick));
     }
 }
 
-
-bool Game::ball_hits_paddle(Ball& ball)
-{
-    if (ball.collision_paddle(paddle, true))
-    {
+bool Game::ball_hits_paddle(Ball &ball) {
+    if (ball.collision_paddle(paddle, true)) {
         // direction nominale balle → paddle (cercle contre cercle)
         const Point diff = ball.getCircle().center - paddle.getCircle().center;
         const double dist = squared_norm(diff);
@@ -679,27 +595,23 @@ bool Game::ball_hits_paddle(Ball& ball)
 
         ball.undo_move();
 
-        if (dist > epsil_squared)
-        {
-            const Point v= {ball.getDx(), ball.getDy()};
-            const Point v_p= {paddle.getX() - paddle.getPrevX(), 0.0};
+        if (dist > epsil_squared) {
+            const Point v = {ball.getDx(), ball.getDy()};
+            const Point v_p = {paddle.getX() - paddle.getPrevX(), 0.0};
 
             const Point vn = (dot(v, diff) / dist) * diff;
             const Point vn_other = (dot(v_p, diff) / dist) * diff;
             const Point impulsion = 2.0 * (vn_other - vn);
-            Point new_v = v+impulsion;
+            Point new_v = v + impulsion;
 
             double d = sqrt(squared_norm(new_v));
-            if (d > delta_norm_max && d > epsil_zero)
-            {
+            if (d > delta_norm_max && d > epsil_zero) {
                 new_v.x *= delta_norm_max / d;
                 new_v.y *= delta_norm_max / d;
             }
 
             ball.set_delta(new_v.x, new_v.y);
-        }
-        else
-        {
+        } else {
             ball.reverse_dy();
         }
 
@@ -709,14 +621,11 @@ bool Game::ball_hits_paddle(Ball& ball)
     return false;
 }
 
-
-bool Game::ball_hits_ball(Ball& ball)
-{
-    for (auto& b : balls)
-    {
+bool Game::ball_hits_ball(Ball &ball) {
+    for (auto &b : balls) {
         if (&ball == b.get()) continue;
 
-        if(ball.collision_ball(*b, true)){
+        if (ball.collision_ball(*b, true)) {
 
             const Point diff = ball.getCircle().center - b->getCircle().center;
             const double dist = squared_norm(diff);
@@ -724,40 +633,35 @@ bool Game::ball_hits_ball(Ball& ball)
 
             ball.undo_move();
 
-            if (dist > epsil_squared)
-            {
-                const Point v= {ball.getDx(), ball.getDy()};
-                const Point v_b= {b->getDx(),b->getDy()};
+            if (dist > epsil_squared) {
+                const Point v = {ball.getDx(), ball.getDy()};
+                const Point v_b = {b->getDx(), b->getDy()};
 
                 const double vn = dot(v, diff) / dist;
                 const double vn_other = dot(v_b, diff) / dist;
 
                 const double r_autre = b->getR() * b->getR();
                 const double r = ball.getR() * ball.getR();
-                const double cte = 2 * r_autre / (r+r_autre);
+                const double cte = 2 * r_autre / (r + r_autre);
 
-                const double impulsion = cte * (vn_other-vn);
+                const double impulsion = cte * (vn_other - vn);
                 Point new_v = v + impulsion * diff;
-                Point new_v_b = v_b - impulsion * (r/r_autre) * diff;
+                Point new_v_b = v_b - impulsion * (r / r_autre) * diff;
 
                 double d = sqrt(squared_norm(new_v));
-                if (d > epsil_zero && d > delta_norm_max)
-                {
+                if (d > epsil_zero && d > delta_norm_max) {
                     new_v.x *= delta_norm_max / d;
                     new_v.y *= delta_norm_max / d;
                 }
                 double d_b = sqrt(squared_norm(new_v_b));
-                if (d_b > epsil_zero && d_b > delta_norm_max)
-                {
+                if (d_b > epsil_zero && d_b > delta_norm_max) {
                     new_v_b.x *= delta_norm_max / d_b;
                     new_v_b.y *= delta_norm_max / d_b;
                 }
 
                 ball.set_delta(new_v.x, new_v.y);
                 b->set_delta(new_v_b.x, new_v_b.y);
-            }
-            else
-            {
+            } else {
                 ball.reverse_dy();
             }
             ball.move();

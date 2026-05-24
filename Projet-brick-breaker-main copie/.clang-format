@@ -1,0 +1,14 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 87
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortBlocksOnASingleLine: true
+BreakBeforeBraces: Attach
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+PointerAlignment: Right
+---

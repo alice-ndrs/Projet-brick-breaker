@@ -1,21 +1,19 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include "Game.h"
 #include <array>
+#include <filesystem>
 #include <gtkmm.h>
 #include <string>
-#include <filesystem>
-#include "Game.h"
 
-
-class My_window : public Gtk::Window
-{
-public:
+class My_window : public Gtk::Window {
+  public:
     using Gtk::Window::Window;
     My_window(std::string file_name);
 
-private:
-    double init_x=0;
+  private:
+    double init_x = 0;
     Game m_game;
     std::string last_file;
     bool level_loaded = false;
@@ -43,8 +41,8 @@ private:
 
     void set_dialog(Gtk::FileChooserDialog *dialog);
     void dialog_response(int response, Gtk::FileChooserDialog *dialog);
-    void open_file(const std::filesystem::path& file_name);
-    void save_file(const std::filesystem::path& file_name);
+    void open_file(const std::filesystem::path &file_name);
+    void save_file(const std::filesystem::path &file_name);
 
     bool loop();
 
@@ -54,9 +52,9 @@ private:
 
     void set_drawing();
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
-    void draw_paddle(const Cairo::RefPtr<Cairo::Context>& cr)const;
-    void draw_bricks(const Cairo::RefPtr<Cairo::Context>& cr)const;
-    void draw_balls(const Cairo::RefPtr<Cairo::Context>& cr)const;
+    void draw_paddle(const Cairo::RefPtr<Cairo::Context> &cr) const;
+    void draw_bricks(const Cairo::RefPtr<Cairo::Context> &cr) const;
+    void draw_balls(const Cairo::RefPtr<Cairo::Context> &cr) const;
 
     void set_mouse_controller();
     void on_drawing_left_click(int n_press, double x, double y);

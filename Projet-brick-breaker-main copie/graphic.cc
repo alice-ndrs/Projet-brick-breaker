@@ -1,26 +1,21 @@
 #include "graphic.h"
-#include "tools.h"
 #include "Constants.h"
 #include "graphic_gui.h"
-#include <cmath>
+#include "tools.h"
 #include <cairomm/context.h>
+#include <cmath>
 
 using namespace std;
 
 const Cairo::RefPtr<Cairo::Context> *ptcr(nullptr);
 
 // graphic_gui.h
-void graphic_set_context(const Cairo::RefPtr<Cairo::Context> &cr)
-{
-    ptcr = &cr;
-}
+void graphic_set_context(const Cairo::RefPtr<Cairo::Context> &cr) { ptcr = &cr; }
 // local functions
-void set_color(Color color)
-{
+void set_color(Color color) {
     double r(0.), g(0.), b(0.);
 
-    switch (color)
-    {
+    switch (color) {
     case RED:
         r = 1.0;
         break;
@@ -61,24 +56,18 @@ void set_color(Color color)
     (*ptcr)->set_source_rgb(r, g, b);
 }
 
-// Dessine un cercle
-void draw_circle (const Circle& c)
-{
+void draw_circle(const Circle &c) {
     (*ptcr)->move_to(c.center.x, c.center.y);
     (*ptcr)->arc(c.center.x, c.center.y, c.r, 0.0, 2.0 * M_PI);
 }
 
-// Dessine un carré 
-void draw_square (const Square& s)
-{
+void draw_square(const Square &s) {
     double half = s.side / 2.0;
     (*ptcr)->rectangle(s.center.x - half, s.center.y - half, s.side, s.side);
     (*ptcr)->fill();
 }
 
-// Dessine un arc
-void draw_arc(const Circle& c)
-{
+void draw_arc(const Circle &c) {
     double dx_squared = c.r * c.r - c.center.y * c.center.y;
 
     if (dx_squared < 0) return;
@@ -86,18 +75,16 @@ void draw_arc(const Circle& c)
     double dx = sqrt(dx_squared);
 
     double angle1 = atan2(-c.center.y, -dx);
-    double angle2 = atan2(-c.center.y,  dx);
+    double angle2 = atan2(-c.center.y, dx);
 
     (*ptcr)->arc_negative(c.center.x, c.center.y, c.r, angle1, angle2);
 }
 
-// Dessine l'arène 
-void draw_arena ()
-{
+void draw_arena() {
     set_color(WHITE);
     (*ptcr)->rectangle(0, 0, arena_size, arena_size);
     (*ptcr)->fill();
-    
+
     set_color(GREY);
     (*ptcr)->set_line_width(0.2);
     (*ptcr)->rectangle(0, 0, arena_size, arena_size);

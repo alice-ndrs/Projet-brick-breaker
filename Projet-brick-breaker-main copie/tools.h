@@ -9,12 +9,12 @@ struct Point {
     double y;
 };
 
-Point operator-(const Point& p1, const Point& p2);
-Point operator+(const Point& p1, const Point& p2);
-Point operator*(double a, const Point& p);
+Point operator-(const Point &p1, const Point &p2);
+Point operator+(const Point &p1, const Point &p2);
+Point operator*(double a, const Point &p);
 
-double dot(const Point& p1, const Point& p2);
-double squared_norm(const Point& p);
+double dot(const Point &p1, const Point &p2);
+double squared_norm(const Point &p);
 
 struct Circle {
     Point center;
@@ -26,11 +26,9 @@ struct Square {
     double side;
 };
 
-
-bool circle_intersects_circle(const Circle& c1, const Circle& c2, bool epsil = false);
-bool square_intersects_square(const Square& s1, const Square& s2, bool epsil = false);
-bool circle_intersects_square(const Circle& c, const Square& s, bool epsil = false);
-bool square_intersects_circle(const Square& s, const Circle& c, bool epsil = false);
-
+bool circle_intersects_circle(const Circle &c1, const Circle &c2, bool epsil = false);
+bool square_intersects_square(const Square &s1, const Square &s2, bool epsil = false);
+bool circle_intersects_square(const Circle &c, const Square &s, bool epsil = false);
+bool square_intersects_circle(const Square &s, const Circle &c, bool epsil = false);
 
 #endif
